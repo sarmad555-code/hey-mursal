@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   cheerByMood,
   herName,
+  herNickname,
   loveNotes,
   moods,
   type MoodId,
@@ -241,6 +242,7 @@ export function CheerApp() {
               <p className="font-display text-5xl font-medium tracking-tight text-ink sm:text-6xl">
                 Hey {herName}
               </p>
+              <p className="mt-2 font-display text-lg text-pink">{herNickname}</p>
               <h1 className="mt-5 max-w-[16ch] font-display text-2xl font-medium leading-snug text-ink/90 sm:text-3xl">
                 A soft pocket made only for you.
               </h1>

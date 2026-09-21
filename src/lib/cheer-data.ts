@@ -1,6 +1,7 @@
 /** Personal pocket for Mursal — edit loveNotes below to add your own messages. */
 
 export const herName = "Mursal";
+export const herNickname = "My Chud";
 
 export type MoodId = "tired" | "heavy" | "anxious" | "lonely" | "okay";
 
@@ -35,7 +36,8 @@ export const cheerByMood: Record<MoodId, CheerContent> = {
     headline: "You don't owe me the story.",
     message:
       "Whatever you're carrying, you don't have to explain it. I'm still right here if you need me — no pressure, no questions required. Just a soft place to land.",
-    reminder: "Beautiful people get heavy days too. Including you.",
+    reminder:
+      "If it feels like the world is against you — it's us against the world. You don't go through it alone.",
   },
   anxious: {
     headline: "Breathe with me, love.",
@@ -62,6 +64,10 @@ export const cheerByMood: Record<MoodId, CheerContent> = {
  * Drop new strings into this list — they'll show up when she taps.
  */
 export const loveNotes = [
+  "If you're reading this when you feel like the world is against you, remember: it's us against the world. You don't have to go through anything alone.",
+  "My Chud — that's you. The name I keep just for you, even on the quiet days.",
+  "Remember central London? Just us, walking around, spending the day together. I still carry that afternoon with me.",
+  "You are so loving and caring to everyone around you. The world gets softer because you walk through it.",
   `${herName}, you don't have to tell me what's going on. I'm here if you need me — no explaining required.`,
   "You're funny in the way that makes ordinary days feel lighter. Never stop being you.",
   "You're beautiful — not as a compliment to collect, just as a quiet fact about the world.",
