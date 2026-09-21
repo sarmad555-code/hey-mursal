@@ -41,9 +41,10 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-blush: var(--blush);
-  --color-peach: var(--peach);
+  --color-sky: var(--sky);
   --color-ink: var(--ink);
   --color-glow: var(--glow);
+  --color-pink: var(--pink);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -54,42 +55,44 @@
 }
 
 :root {
-  --background: #fff3ee;
-  --foreground: #2c1520;
-  --card: #fff8f5;
-  --card-foreground: #2c1520;
-  --popover: #fff8f5;
-  --popover-foreground: #2c1520;
-  --primary: #c45b6a;
-  --primary-foreground: #fff7f5;
-  --secondary: #f3d2c8;
-  --secondary-foreground: #3a1f28;
-  --muted: #f6e4dd;
-  --muted-foreground: #7a5560;
-  --accent: #ffb89a;
-  --accent-foreground: #3a1f28;
+  /* Soft sky blue + blush pink — cute, not purple */
+  --background: #eef5ff;
+  --foreground: #1f2d44;
+  --card: #f7faff;
+  --card-foreground: #1f2d44;
+  --popover: #f7faff;
+  --popover-foreground: #1f2d44;
+  --primary: #4d8fd6;
+  --primary-foreground: #f7fbff;
+  --secondary: #ffd6e3;
+  --secondary-foreground: #3a2740;
+  --muted: #dce9f8;
+  --muted-foreground: #5d6f8a;
+  --accent: #ff9eb8;
+  --accent-foreground: #3a2740;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #ebcfc6;
-  --input: #ebcfc6;
-  --ring: #c45b6a;
-  --blush: #ffd6cc;
-  --peach: #ffb89a;
-  --ink: #2c1520;
-  --glow: #ffe4c4;
-  --chart-1: #c45b6a;
-  --chart-2: #ffb89a;
-  --chart-3: #e08a7a;
-  --chart-4: #7a5560;
-  --chart-5: #2c1520;
-  --radius: 1rem;
-  --sidebar: #fff8f5;
-  --sidebar-foreground: #2c1520;
-  --sidebar-primary: #c45b6a;
-  --sidebar-primary-foreground: #fff7f5;
-  --sidebar-accent: #f6e4dd;
-  --sidebar-accent-foreground: #2c1520;
-  --sidebar-border: #ebcfc6;
-  --sidebar-ring: #c45b6a;
+  --border: #c9daf0;
+  --input: #c9daf0;
+  --ring: #4d8fd6;
+  --blush: #ffd0e0;
+  --sky: #a8d0f5;
+  --ink: #1f2d44;
+  --glow: #c8e4ff;
+  --pink: #ff9eb8;
+  --chart-1: #4d8fd6;
+  --chart-2: #ff9eb8;
+  --chart-3: #7eb6e8;
+  --chart-4: #5d6f8a;
+  --chart-5: #1f2d44;
+  --radius: 1.15rem;
+  --sidebar: #f7faff;
+  --sidebar-foreground: #1f2d44;
+  --sidebar-primary: #4d8fd6;
+  --sidebar-primary-foreground: #f7fbff;
+  --sidebar-accent: #dce9f8;
+  --sidebar-accent-foreground: #1f2d44;
+  --sidebar-border: #c9daf0;
+  --sidebar-ring: #4d8fd6;
 }
 
 @layer base {
@@ -163,7 +166,7 @@
     opacity: 0;
   }
   10% {
-    opacity: 0.55;
+    opacity: 0.65;
   }
   100% {
     transform: translateY(110vh) rotate(160deg);
@@ -178,8 +181,30 @@
     transform: scale(1);
   }
   50% {
-    opacity: 0.75;
+    opacity: 0.8;
     transform: scale(1.06);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(12deg);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }
 
@@ -201,6 +226,14 @@
 
 .animate-soft-pulse {
   animation: soft-pulse 3.5s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+.animate-bob {
+  animation: bob 3s ease-in-out infinite;
 }
 
 .petal {

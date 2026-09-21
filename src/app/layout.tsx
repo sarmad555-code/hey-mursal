@@ -19,9 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hey Love — a little cheer, just for you",
+  title: "Hey Love — a cute little cheer, just for you",
   description:
-    "A soft mobile pocket of love notes, hugs, and reminders made for the special woman in your life.",
+    "A soft blue-and-pink mobile pocket of love notes, hugs, and reminders made for someone special.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -33,7 +33,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#fff3ee",
+  themeColor: "#eef5ff",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

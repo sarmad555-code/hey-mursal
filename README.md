@@ -1,6 +1,6 @@
 # Hey Love
 
-A mobile web app made to cheer up someone special — soft love notes, a press-and-hold hug, and gentle reminders for hard days.
+A cute mobile web app made to cheer up someone special — soft sky blues, pink accents, love notes, a press-and-hold hug, and gentle reminders for hard days.
 
 ## Run locally
 
