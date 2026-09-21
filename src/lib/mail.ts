@@ -5,21 +5,29 @@ export function inboxAddress(who: "sarmad" | "mursal") {
   return who === "sarmad" ? SARMAD_EMAIL : MURSAL_EMAIL;
 }
 
-export function hugMailContent(options: { to: "sarmad" | "mursal"; note?: string }) {
+export function hugMailContent(options: {
+  to: "sarmad" | "mursal";
+  note?: string;
+  mood?: string;
+}) {
   const address = inboxAddress(options.to);
   const subject =
     options.to === "sarmad"
       ? "Mursal sent you a hug"
       : "A hug just found you, Mursal";
   const note = options.note?.trim();
+  const mood = options.mood?.trim();
   const text =
     options.to === "sarmad"
       ? [
           "Mursal just sent you a hug from her pocket.",
-          note ? `She wrote: “${note}”` : "No words — just the hug.",
+          mood ? `She's feeling: ${mood}` : "She didn't pick a mood.",
+          note ? `She wrote: “${note}”` : "",
           "",
           "Send one back anytime at /sarmadaccess",
-        ].join("\n")
+        ]
+          .filter((line) => line !== "")
+          .join("\n")
       : [
           "A hug was sent back to you.",
           note ? `He wrote: “${note}”` : "No words — just the hug.",
@@ -32,6 +40,7 @@ export function hugMailContent(options: { to: "sarmad" | "mursal"; note?: string
 export async function sendHugMail(options: {
   to: "sarmad" | "mursal";
   note?: string;
+  mood?: string;
 }): Promise<{ emailed: boolean; via?: string; mail: ReturnType<typeof hugMailContent> }> {
   const mail = hugMailContent(options);
   const { address, subject, text } = mail;

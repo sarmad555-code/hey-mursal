@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PaperPlaneFlight } from "@/components/paper-plane";
+import type { HomePill } from "@/lib/cheer-data";
 import type { Hug } from "@/lib/hugs";
 
 export default function SarmadAccessPage() {
@@ -14,11 +15,15 @@ export default function SarmadAccessPage() {
   const [drafts, setDrafts] = useState<string[]>([]);
   const [savingNotes, setSavingNotes] = useState(false);
   const [noteStatus, setNoteStatus] = useState<string | null>(null);
+  const [pillDrafts, setPillDrafts] = useState<HomePill[]>([]);
+  const [savingPills, setSavingPills] = useState(false);
+  const [pillStatus, setPillStatus] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [hugResponse, noteResponse] = await Promise.all([
+    const [hugResponse, noteResponse, pillResponse] = await Promise.all([
       fetch("/api/hugs?inbox=sarmad"),
       fetch("/api/notes"),
+      fetch("/api/pills"),
     ]);
     if (hugResponse.ok) {
       const data = (await hugResponse.json()) as { hugs: Hug[] };
@@ -27,6 +32,10 @@ export default function SarmadAccessPage() {
     if (noteResponse.ok) {
       const data = (await noteResponse.json()) as { notes: string[] };
       setDrafts(data.notes);
+    }
+    if (pillResponse.ok) {
+      const data = (await pillResponse.json()) as { pills: HomePill[] };
+      setPillDrafts(data.pills);
     }
   }, []);
 
@@ -97,6 +106,29 @@ export default function SarmadAccessPage() {
     }
   }
 
+  async function savePills() {
+    setSavingPills(true);
+    setPillStatus(null);
+    try {
+      const response = await fetch("/api/pills", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pills: pillDrafts }),
+      });
+      const data = (await response.json()) as { pills?: HomePill[]; error?: string };
+      if (!response.ok || !data.pills) {
+        setPillStatus(data.error ?? "Could not save those.");
+        return;
+      }
+      setPillDrafts(data.pills);
+      setPillStatus("Saved. Her home pills will use this wording.");
+    } catch {
+      setPillStatus("Could not save just now.");
+    } finally {
+      setSavingPills(false);
+    }
+  }
+
   return (
     <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-[#eef5ff] px-6 py-10 text-[#1f2d44]">
       {flight && <PaperPlaneFlight mode="away" onDone={() => setFlight(false)} />}
@@ -146,8 +178,13 @@ export default function SarmadAccessPage() {
                 {new Date(hug.createdAt).toLocaleString()}
                 {hug.seen ? "" : " · new"}
               </p>
+              {hug.mood ? (
+                <p className="mt-1 text-sm font-medium text-[#1f2d44]">
+                  She&apos;s feeling: {hug.mood}
+                </p>
+              ) : null}
               <p className="mt-1 text-sm text-[#5d6f8a]">
-                {hug.note || "A hug, no words."}
+                {hug.note || (hug.mood ? "" : "A hug, no words.")}
               </p>
             </li>
           ))}
@@ -205,6 +242,75 @@ export default function SarmadAccessPage() {
         </Button>
       </div>
       {noteStatus && <p className="mt-3 text-sm text-[#5d6f8a]">{noteStatus}</p>}
+
+      <h2 className="mt-12 font-display text-2xl">Home pills</h2>
+      <p className="mt-2 text-sm leading-relaxed text-[#5d6f8a]">
+        These are the little buttons on her home screen. Rewrite the label and the line she sees when she taps one.
+      </p>
+      <div className="mt-4 flex flex-col gap-4">
+        {pillDrafts.map((pill, index) => (
+          <div key={pill.id} className="rounded-2xl bg-white/70 p-3 ring-1 ring-[#4d8fd6]/10">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs text-[#5d6f8a]">Pill {index + 1}</span>
+              <button
+                type="button"
+                className="text-xs text-[#c45b7a]"
+                onClick={() =>
+                  setPillDrafts((current) => current.filter((item) => item.id !== pill.id))
+                }
+              >
+                Remove
+              </button>
+            </div>
+            <input
+              value={pill.label}
+              maxLength={40}
+              onChange={(event) =>
+                setPillDrafts((current) =>
+                  current.map((item) =>
+                    item.id === pill.id ? { ...item, label: event.target.value } : item
+                  )
+                )
+              }
+              className="w-full rounded-xl bg-white px-3 py-2 text-sm ring-1 ring-[#4d8fd6]/15 outline-none"
+            />
+            <textarea
+              value={pill.line}
+              maxLength={280}
+              onChange={(event) =>
+                setPillDrafts((current) =>
+                  current.map((item) =>
+                    item.id === pill.id ? { ...item, line: event.target.value } : item
+                  )
+                )
+              }
+              className="mt-2 min-h-20 w-full rounded-xl bg-white px-3 py-2 text-sm leading-relaxed ring-1 ring-[#4d8fd6]/15 outline-none"
+            />
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-col gap-3">
+        <Button
+          variant="secondary"
+          className="h-11 rounded-2xl bg-[#ffd6e3] text-[#3a2740]"
+          onClick={() =>
+            setPillDrafts((current) => [
+              ...current,
+              { id: `pill-${Date.now()}`, label: "", line: "" },
+            ])
+          }
+        >
+          Add a pill
+        </Button>
+        <Button
+          className="h-11 rounded-2xl bg-[#4d8fd6] text-white hover:bg-[#4d8fd6]/90"
+          onClick={() => void savePills()}
+          disabled={savingPills}
+        >
+          Save home pills
+        </Button>
+      </div>
+      {pillStatus && <p className="mt-3 text-sm text-[#5d6f8a]">{pillStatus}</p>}
     </main>
   );
 }

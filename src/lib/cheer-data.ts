@@ -59,6 +59,12 @@ export const cheerByMood: Record<MoodId, CheerContent> = {
   },
 };
 
+export type HomePill = {
+  id: string;
+  label: string;
+  line: string;
+};
+
 export const piecesOfHer = [
   {
     id: "pasta",
@@ -98,20 +104,20 @@ export const piecesOfHer = [
  */
 export const loveNotes = [
   "If you're reading this when you feel like the world is against you, remember: it's us against the world. You don't have to go through anything alone.",
-  "My Chud — that's you. The name I keep just for you, even on the quiet days.",
-  "Remember central London? Just us, walking around, spending the day together. I still carry that afternoon with me.",
+  "My Chud — that's you. The name I keep just for you, my chungus ahh chud <3.",
+  "Remember central London? Just us, walking around, spending the day together. I think about it, and you, constantly.",
   "You are so loving and caring to everyone around you. The world gets softer because you walk through it.",
-  `${herName}, you don't have to tell me what's going on. I'm here if you need me — no explaining required.`,
-  "You're funny in the way that makes ordinary days feel lighter. Never stop being you.",
-  "You're beautiful — not as a compliment to collect, just as a quiet fact about the world.",
-  "Somewhere there's a perfect plate of pasta with your name on it. I believe in that deeply.",
-  "Cooking with you (or thinking about you cooking) feels like the softest kind of home.",
-  "Baking days, flour on the counter, something sweet in the oven — that's peak Mursal magic.",
-  "Nature looks better when you're in it. Trees, sky, you — unfair combo.",
-  "Give Jonny an extra scratch from me. Goodest boy energy. Always.",
-  "Tell Mango I said hi. Tiny bird, huge personality — sounds familiar.",
+  "Mursal, you don't have to tell me what's going on. I'm here if you need me, no explaining required.",
+  "You're funny in the way that makes ordinary days feel lighter. Never stop being you. Got a nga beaming at his phone.",
+  "You're beautiful - not as a compliment to collect, just as a quiet fact I choose to hold.",
+  "Somewhere there's a perfect plate of pasta with your name on it. With as much sauce and cheese as you want <3.",
+  "Cooking with you (or thinking about you cooking rather) would feel like heaven on earth xx.",
+  "Baking days, flour on the counter, something sweet in the oven, that's my chud in her element.",
+  "Nature looks better when you're in it <3.",
+  "Give Jonny an extra scratch from me. Das my son nga <3.",
+  "Tell Mango I said 'tweet, tweet tweet.' she'll catch my drift. Tiny bird with a huge personality. Sounds familiar.",
   "Jonny + Mango + you = the cutest little ecosystem I know.",
-  "You make kitchens feel warmer and trails feel kinder. That's a talent.",
-  "If today is hard, you still don't owe me the details. I'm here. Full stop.",
-  "Come back whenever. This pocket stays open — hugs included, no time limit.",
+  "You make kitchens feel warmer and thats not just cause of the oven <3.",
+  "If today is hard, you still don't owe me the details. I'm here. Always.",
+  "Come back whenever. This pocket stays open, hugs included, no time limit. but ill start charging 50 CAD when you annoy me xx.",
 ];

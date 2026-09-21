@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     from?: string;
     inbox?: string;
     note?: string;
+    mood?: string;
   } | null;
 
   if (!body) {
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
 
   const to = from === "mursal" ? "sarmad" : "mursal";
   const note = typeof body.note === "string" ? body.note : "";
+  const mood = typeof body.mood === "string" ? body.mood : "";
   const recent = await recentlySent(from);
   if (recent) {
     return NextResponse.json({ ok: true, throttled: true, emailed: recent.emailed, hug: recent });
@@ -50,14 +52,14 @@ export async function POST(request: Request) {
 
   let emailed = false;
   try {
-    const result = await sendHugMail({ to, note });
+    const result = await sendHugMail({ to, note, mood });
     emailed = result.emailed;
   } catch (error) {
     console.error("Hug mail threw", error);
   }
 
-  const hug = await addHug({ from, note, emailed });
-  const mail = hugMailContent({ to, note });
+  const hug = await addHug({ from, note, mood, emailed });
+  const mail = hugMailContent({ to, note, mood });
   return NextResponse.json({
     ok: true,
     throttled: false,

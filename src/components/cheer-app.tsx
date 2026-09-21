@@ -10,6 +10,7 @@ import {
   loveNotes,
   moods,
   piecesOfHer,
+  type HomePill,
   type MoodId,
 } from "@/lib/cheer-data";
 import type { Hug } from "@/lib/hugs";
@@ -155,7 +156,8 @@ export function CheerApp() {
   const [notes, setNotes] = useState<string[]>(loveNotes);
   const [noteIndex, setNoteIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [pieceId, setPieceId] = useState<(typeof piecesOfHer)[number]["id"] | null>(null);
+  const [pieces, setPieces] = useState<HomePill[]>(piecesOfHer.map((piece) => ({ ...piece })));
+  const [pieceId, setPieceId] = useState<string | null>(null);
   const [flight, setFlight] = useState<null | "away" | "in">(null);
   const [sendingHug, setSendingHug] = useState(false);
   const [sentNote, setSentNote] = useState<string | null>(null);
@@ -176,6 +178,16 @@ export function CheerApp() {
       })
       .catch(() => {
         // The built-in notes still show if this fails.
+      });
+    void fetch("/api/pills")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { pills?: HomePill[] } | null) => {
+        if (!cancelled && data?.pills && data.pills.length > 0) {
+          setPieces(data.pills);
+        }
+      })
+      .catch(() => {
+        // The built-in pills still show if this fails.
       });
     return () => {
       cancelled = true;
@@ -296,7 +308,14 @@ export function CheerApp() {
       const response = await fetch("/api/hugs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "send", from: "mursal" }),
+        body: JSON.stringify({
+          action: "send",
+          from: "mursal",
+          mood: (() => {
+            const chosen = moods.find((item) => item.id === mood);
+            return chosen ? `${chosen.label} — ${chosen.hint}` : "";
+          })(),
+        }),
       });
       const data = (await response.json()) as { throttled?: boolean };
       setSentNote(
@@ -327,7 +346,7 @@ export function CheerApp() {
 
   sendHugRef.current = sendHimAHug;
 
-  const activePiece = piecesOfHer.find((piece) => piece.id === pieceId);
+  const activePiece = pieces.find((piece) => piece.id === pieceId);
 
   function hugLabel() {
     if (holding) {
@@ -382,8 +401,9 @@ export function CheerApp() {
                 You don&apos;t have to tell me what&apos;s going on. I&apos;m here if you need me —
                 pasta dreams, nature walks, Jonny &amp; Mango included.
               </p>
+              <p className="mt-4 font-display text-lg text-primary">Love, Sarmad xx</p>
               <div className="mt-5 flex flex-wrap gap-2">
-                {piecesOfHer.map((piece) => (
+                {pieces.map((piece) => (
                   <button
                     key={piece.id}
                     type="button"
@@ -406,7 +426,7 @@ export function CheerApp() {
               )}
             </div>
 
-            <div className="relative mt-10 flex flex-1 items-end justify-center pb-6">
+            <div className="relative mt-8 flex flex-1 flex-col items-center justify-end pb-4">
               <div className="animate-float-soft relative flex h-52 w-52 items-center justify-center">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-b from-glow via-sky/80 to-blush opacity-95 shadow-[0_30px_60px_-20px_rgba(77,143,214,0.45)]" />
                 <div className="absolute inset-5 rounded-full bg-gradient-to-tr from-primary/20 via-white/30 to-pink/35" />
@@ -424,10 +444,10 @@ export function CheerApp() {
                     opacity="0.95"
                   />
                 </svg>
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-white/70 px-3 py-1 text-[11px] font-medium tracking-wide text-primary shadow-sm ring-1 ring-primary/10">
-                  Jonny · Mango · you
-                </span>
               </div>
+              <p className="mt-3 w-full text-center text-sm font-medium tracking-wide text-primary">
+                Jonny · Mango · you
+              </p>
             </div>
 
             <div className="animate-fade-up" style={{ animationDelay: "0.15s" }}>

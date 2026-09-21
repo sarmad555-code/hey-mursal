@@ -9,6 +9,7 @@ export type Hug = {
   from: Person;
   to: Person;
   note: string;
+  mood?: string;
   createdAt: string;
   seen: boolean;
   emailed: boolean;
@@ -51,6 +52,7 @@ export async function recentlySent(from: Person) {
 export async function addHug(input: {
   from: Person;
   note?: string;
+  mood?: string;
   emailed: boolean;
 }): Promise<Hug> {
   const hugs = await readAll();
@@ -61,6 +63,7 @@ export async function addHug(input: {
     from: input.from,
     to,
     note: (input.note ?? "").trim().slice(0, 240),
+    mood: (input.mood ?? "").trim().slice(0, 160),
     createdAt: new Date().toISOString(),
     seen: false,
     emailed: input.emailed,
