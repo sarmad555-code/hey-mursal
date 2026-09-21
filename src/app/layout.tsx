@@ -18,10 +18,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const site =
+  process.env.APP_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:4321");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(site),
   title: "Hey Mursal — a soft pocket just for you",
   description:
     "A blue-and-pink cheer-up pocket for Mursal — love notes, unlimited hugs, and a reminder she's never alone.",
+  openGraph: {
+    title: "Hey Mursal",
+    description: "A soft blue-and-pink pocket, just for you.",
+    siteName: "Hey Mursal",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

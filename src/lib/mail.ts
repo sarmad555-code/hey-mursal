@@ -1,8 +1,7 @@
 import { hugEmailHtml } from "@/lib/hug-email";
 
 const SARMAD_EMAIL = "sarmadsimab@gmail.com";
-// Temporary: hugs meant for Mursal go to Sarmad until her inbox is ready.
-const MURSAL_EMAIL = "sarmadsimab555@gmail.com";
+const MURSAL_EMAIL = "mursalsafar1357@gmail.com";
 
 export function inboxAddress(who: "sarmad" | "mursal") {
   return who === "sarmad" ? SARMAD_EMAIL : MURSAL_EMAIL;
