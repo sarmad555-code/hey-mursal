@@ -19,13 +19,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hey Love — a cute little cheer, just for you",
+  title: "Hey Mursal — a soft pocket just for you",
   description:
-    "A soft blue-and-pink mobile pocket of love notes, hugs, and reminders made for someone special.",
+    "A blue-and-pink cheer-up pocket for Mursal — love notes, unlimited hugs, and a reminder she's never alone.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Hey Love",
+    title: "Hey Mursal",
   },
 };
 

@@ -1,3 +1,7 @@
+/** Personal pocket for Mursal — edit loveNotes below to add your own messages. */
+
+export const herName = "Mursal";
+
 export type MoodId = "tired" | "heavy" | "anxious" | "lonely" | "okay";
 
 export type Mood = {
@@ -22,46 +26,53 @@ export const moods: Mood[] = [
 
 export const cheerByMood: Record<MoodId, CheerContent> = {
   tired: {
-    headline: "Nap-approved. Always.",
+    headline: `Rest easy, ${herName}.`,
     message:
-      "You don't have to be bright and shiny right now. Close your eyes for a second — I'm right here keeping watch.",
-    reminder: "Tired you is still my favorite you.",
+      "You don't have to tell me what's going on. Truly. Just know I'm here — for the quiet days, the heavy ones, and every soft in-between.",
+    reminder: "Jonny can keep watch. I've got you too.",
   },
   heavy: {
-    headline: "Come sit with me.",
+    headline: "You don't owe me the story.",
     message:
-      "Whatever you're carrying, you can set it down for a minute. I've got both arms open.",
-    reminder: "Heavy days still get soft blue skies and pink hugs.",
+      "Whatever you're carrying, you don't have to explain it. I'm still right here if you need me — no pressure, no questions required. Just a soft place to land.",
+    reminder: "Beautiful people get heavy days too. Including you.",
   },
   anxious: {
     headline: "Breathe with me, love.",
     message:
-      "In… and out. You're safe. The spiral can wait outside while we stay right here.",
+      "You don't have to tell me what's swirling. I'm here anyway — steady, silly if you need a laugh, quiet if you don't. Take the next breath. I've got this minute with you.",
     reminder: "Even fluttery hearts are still so loved.",
   },
   lonely: {
-    headline: "I'm thinking of you.",
+    headline: `I'm thinking of you, ${herName}.`,
     message:
-      "Across any distance, you're held. Someone made this little pocket just so you'd never feel alone in it.",
-    reminder: "You are missed in the sweetest way.",
+      "You don't have to say a word about what's going on. I'm here if you need me — always. Until then, picture Jonny's soft eyes and Mango chirping somewhere nearby. You're not alone.",
+    reminder: "Someone made this pocket so you'd never feel far from care.",
   },
   okay: {
     headline: "Then let's make it sweeter.",
     message:
-      "Okay is a cute place to start. Here's an extra sprinkle of love, just because you're you.",
-    reminder: "You don't need a reason to be spoiled with care.",
+      "Okay is a cute place to start. And just so you know — you never have to report in. I'm here if you need me, and I'm proud of you either way.",
+    reminder: "Funny, beautiful you — spoiled with care for no reason at all.",
   },
 };
 
+/**
+ * Add your own notes for Mursal here anytime.
+ * Drop new strings into this list — they'll show up when she taps.
+ */
 export const loveNotes = [
-  "You make ordinary days feel sparkly.",
-  "I notice the quiet ways you try — and I adore you for them.",
-  "Your smile is still my soft spot.",
-  "You are allowed to take up space. Softly. Fully. Freely.",
-  "The world is luckier with you in it. So am I.",
-  "Even on cloudy days, you're my favorite person.",
-  "Nothing about you needs fixing to be worthy of care.",
-  "If I could wrap you in a blue-sky hug, I would. This is the closest I could get.",
-  "You're doing better than you think. Truly.",
-  "Come back here anytime. This cute little pocket stays open for you.",
+  `${herName}, you don't have to tell me what's going on. I'm here if you need me — no explaining required.`,
+  "You're funny in the way that makes ordinary days feel lighter. Never stop being you.",
+  "You're beautiful — not as a compliment to collect, just as a quiet fact about the world.",
+  "Somewhere there's a perfect plate of pasta with your name on it. I believe in that deeply.",
+  "Cooking with you (or thinking about you cooking) feels like the softest kind of home.",
+  "Baking days, flour on the counter, something sweet in the oven — that's peak Mursal magic.",
+  "Nature looks better when you're in it. Trees, sky, you — unfair combo.",
+  "Give Jonny an extra scratch from me. Goodest boy energy. Always.",
+  "Tell Mango I said hi. Tiny bird, huge personality — sounds familiar.",
+  "Jonny + Mango + you = the cutest little ecosystem I know.",
+  "You make kitchens feel warmer and trails feel kinder. That's a talent.",
+  "If today is hard, you still don't owe me the details. I'm here. Full stop.",
+  "Come back whenever. This pocket stays open — hugs included, no time limit.",
 ];

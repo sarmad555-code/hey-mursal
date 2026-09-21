@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, type PointerEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
   cheerByMood,
+  herName,
   loveNotes,
   moods,
   type MoodId,
@@ -76,7 +77,6 @@ function Atmosphere({ intensify = false }: { intensify?: boolean }) {
         style={{ animationDelay: "-4s" }}
       />
 
-      {/* Soft cloud hills */}
       <svg
         className="absolute bottom-0 left-0 w-full opacity-70"
         viewBox="0 0 390 180"
@@ -135,22 +135,40 @@ function FloatingBits({ active }: { active: boolean }) {
   );
 }
 
+function formatHugTime(seconds: number) {
+  if (seconds < 60) return `${seconds}s`;
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}m ${s.toString().padStart(2, "0")}s`;
+}
+
 export function CheerApp() {
   const [step, setStep] = useState<Step>("welcome");
   const [mood, setMood] = useState<MoodId | null>(null);
   const [holding, setHolding] = useState(false);
-  const [hugReady, setHugReady] = useState(false);
+  const [hugSeconds, setHugSeconds] = useState(0);
+  const [longestHug, setLongestHug] = useState(0);
   const [noteIndex, setNoteIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
     if (!holding) return;
-    const timer = window.setTimeout(() => setHugReady(true), 900);
-    return () => window.clearTimeout(timer);
+    setHugSeconds(0);
+    const started = Date.now();
+    const tick = window.setInterval(() => {
+      setHugSeconds(Math.floor((Date.now() - started) / 1000));
+    }, 250);
+    return () => {
+      window.clearInterval(tick);
+      const elapsed = Math.floor((Date.now() - started) / 1000);
+      setLongestHug((prev) => Math.max(prev, elapsed));
+      setHugSeconds(elapsed);
+    };
   }, [holding]);
 
   const cheer = mood ? cheerByMood[mood] : null;
+  const hugging = holding;
 
   function go(next: Step) {
     startTransition(() => {
@@ -161,9 +179,21 @@ export function CheerApp() {
 
   function pickMood(id: MoodId) {
     setMood(id);
-    setHugReady(false);
     setHolding(false);
+    setHugSeconds(0);
     go("cheer");
+  }
+
+  function startHug(event: PointerEvent<HTMLButtonElement>) {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setHolding(true);
+  }
+
+  function endHug(event: PointerEvent<HTMLButtonElement>) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setHolding(false);
   }
 
   function nextNote() {
@@ -177,16 +207,25 @@ export function CheerApp() {
   function restart() {
     setMood(null);
     setHolding(false);
-    setHugReady(false);
+    setHugSeconds(0);
     setNoteIndex(0);
     setRevealed(false);
     go("welcome");
   }
 
+  function hugLabel() {
+    if (holding) {
+      if (hugSeconds < 1) return "I've got you…";
+      return `Still here · ${formatHugTime(hugSeconds)}`;
+    }
+    if (longestHug > 0) return "Hold again anytime";
+    return "Hold for a hug";
+  }
+
   return (
     <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden">
-      <Atmosphere intensify={step === "cheer" && hugReady} />
-      <FloatingBits active={step === "notes" || (step === "cheer" && hugReady)} />
+      <Atmosphere intensify={step === "cheer" && hugging} />
+      <FloatingBits active={step === "notes" || (step === "cheer" && hugging)} />
 
       <div className="relative z-10 flex flex-1 flex-col px-6 pb-10 pt-[max(1.5rem,env(safe-area-inset-top))]">
         {step === "welcome" && (
@@ -195,18 +234,19 @@ export function CheerApp() {
               <div className="mb-3 flex items-center gap-2 text-pink">
                 <TinyHeart className="text-pink" />
                 <span className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
-                  just for you
+                  just for mursal
                 </span>
                 <TinyHeart className="text-primary" />
               </div>
               <p className="font-display text-5xl font-medium tracking-tight text-ink sm:text-6xl">
-                Hey Love
+                Hey {herName}
               </p>
-              <h1 className="mt-5 max-w-[15ch] font-display text-2xl font-medium leading-snug text-ink/90 sm:text-3xl">
-                A cute little pocket made just for you.
+              <h1 className="mt-5 max-w-[16ch] font-display text-2xl font-medium leading-snug text-ink/90 sm:text-3xl">
+                A soft pocket made only for you.
               </h1>
-              <p className="mt-4 max-w-[30ch] text-base leading-relaxed text-muted-foreground">
-                Soft blues, a splash of pink, and all the love I could fit on one screen.
+              <p className="mt-4 max-w-[32ch] text-base leading-relaxed text-muted-foreground">
+                You don&apos;t have to tell me what&apos;s going on. I&apos;m here if you need me —
+                pasta dreams, nature walks, Jonny &amp; Mango included.
               </p>
             </div>
 
@@ -229,7 +269,7 @@ export function CheerApp() {
                   />
                 </svg>
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-white/70 px-3 py-1 text-[11px] font-medium tracking-wide text-primary shadow-sm ring-1 ring-primary/10">
-                  your blue sky
+                  Jonny · Mango · you
                 </span>
               </div>
             </div>
@@ -257,13 +297,13 @@ export function CheerApp() {
             </button>
             <div className="animate-fade-up mt-8">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
-                Hey Love <TinyHeart className="text-pink" />
+                Hey {herName} <TinyHeart className="text-pink" />
               </p>
               <h2 className="mt-2 font-display text-3xl font-medium text-ink">
                 How&apos;s your heart?
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Pick whatever feels true. No wrong answers, cutie.
+                No wrong answers. You don&apos;t even have to explain why.
               </p>
             </div>
 
@@ -315,7 +355,7 @@ export function CheerApp() {
 
             <div className="animate-fade-up mt-8">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
-                Hey Love <TinyHeart className="text-pink" />
+                Hey {herName} <TinyHeart className="text-pink" />
               </p>
               <h2 className="mt-2 font-display text-3xl font-medium leading-tight text-ink">
                 {cheer.headline}
@@ -328,33 +368,35 @@ export function CheerApp() {
               </p>
             </div>
 
-            <div className="mt-auto flex flex-col items-center gap-4 pt-10">
+            <div className="mt-auto flex flex-col items-center gap-3 pt-10">
+              <p className="text-center text-xs text-muted-foreground">
+                Hold as long as you want — no timer, no rush.
+              </p>
               <button
                 type="button"
-                aria-label="Press and hold for a hug"
-                onPointerDown={() => setHolding(true)}
-                onPointerUp={() => setHolding(false)}
-                onPointerLeave={() => setHolding(false)}
-                onPointerCancel={() => setHolding(false)}
+                aria-label="Press and hold for a hug — hold as long as you want"
+                onPointerDown={startHug}
+                onPointerUp={endHug}
+                onPointerCancel={endHug}
                 className={cn(
-                  "relative flex h-36 w-36 touch-none select-none items-center justify-center rounded-full bg-gradient-to-b from-glow via-sky to-blush text-center shadow-[0_20px_40px_-18px_rgba(77,143,214,0.55)] transition",
-                  holding && "animate-heartbeat scale-105",
-                  hugReady && "ring-4 ring-pink/40"
+                  "relative flex h-40 w-40 touch-none select-none items-center justify-center rounded-full bg-gradient-to-b from-glow via-sky to-blush text-center shadow-[0_20px_40px_-18px_rgba(77,143,214,0.55)] transition",
+                  holding && "animate-heartbeat scale-105 ring-4 ring-pink/40"
                 )}
               >
                 <span className="px-4 font-display text-lg font-medium leading-snug text-ink">
-                  {hugReady
-                    ? "Squeeze complete"
-                    : holding
-                      ? "Stay…"
-                      : "Hold for a hug"}
+                  {hugLabel()}
                 </span>
-                {hugReady && (
+                {holding && (
                   <span className="absolute -top-1 -right-1 animate-bob">
                     <TinyHeart className="h-5 w-5 text-pink" />
                   </span>
                 )}
               </button>
+              {!holding && longestHug > 0 && (
+                <p className="text-center text-xs text-primary/80">
+                  Last hug · {formatHugTime(longestHug)} · come back anytime
+                </p>
+              )}
 
               <Button
                 size="lg"
@@ -382,13 +424,13 @@ export function CheerApp() {
 
             <div className="animate-fade-up mt-8">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
-                Hey Love <TinyHeart className="text-pink" />
+                Hey {herName} <TinyHeart className="text-pink" />
               </p>
               <h2 className="mt-2 font-display text-3xl font-medium text-ink">
                 Little notes for you
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Tap for another sprinkle of love.
+                Pasta, nature, Jonny, Mango — and how wonderful you are.
               </p>
             </div>
 
@@ -403,7 +445,7 @@ export function CheerApp() {
                 <>
                   <span className="font-display text-2xl text-ink">Tap me</span>
                   <span className="mt-2 text-sm text-muted-foreground">
-                    A sweet note is hiding here
+                    A note for {herName} is hiding here
                   </span>
                 </>
               ) : (
@@ -447,13 +489,14 @@ export function CheerApp() {
                 <TinyHeart className="animate-bob text-primary [animation-delay:0.4s]" />
               </div>
               <p className="font-display text-5xl font-medium text-ink">
-                Hey Love
+                Hey {herName}
               </p>
               <h2 className="mt-8 font-display text-2xl font-medium leading-snug text-ink">
-                Come back whenever, cutie.
+                Come back whenever.
               </h2>
-              <p className="mx-auto mt-4 max-w-[28ch] text-base leading-relaxed text-muted-foreground">
-                Your blue-and-pink pocket stays open — soft light, sweet words, and a hug on standby.
+              <p className="mx-auto mt-4 max-w-[30ch] text-base leading-relaxed text-muted-foreground">
+                You never have to explain. I&apos;m here if you need me — and Jonny &amp; Mango
+                send soft hellos too.
               </p>
             </div>
 
