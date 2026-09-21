@@ -1,3 +1,5 @@
+import { hugEmailHtml } from "@/lib/hug-email";
+
 const SARMAD_EMAIL = "sarmadsimab@gmail.com";
 // Temporary: hugs meant for Mursal go to Sarmad until her inbox is ready.
 const MURSAL_EMAIL = "sarmadsimab555@gmail.com";
@@ -35,7 +37,8 @@ export function hugMailContent(options: {
           "",
           "You don't have to explain anything. Open your pocket when you want it.",
         ].join("\n");
-  return { address, subject, text };
+  const html = hugEmailHtml({ to: options.to, note, mood });
+  return { address, subject, text, html };
 }
 
 export async function sendHugMail(options: {
@@ -44,7 +47,7 @@ export async function sendHugMail(options: {
   mood?: string;
 }): Promise<{ emailed: boolean; via?: string; mail: ReturnType<typeof hugMailContent> }> {
   const mail = hugMailContent(options);
-  const { address, subject, text } = mail;
+  const { address, subject, text, html } = mail;
 
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
@@ -56,7 +59,7 @@ export async function sendHugMail(options: {
         Authorization: `Bearer ${resendKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from, to: address, subject, text }),
+      body: JSON.stringify({ from, to: address, subject, text, html }),
     });
     if (!response.ok) {
       const detail = await response.text();
