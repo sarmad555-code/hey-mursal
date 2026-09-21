@@ -26,3 +26,4 @@ Hugs always land inside the app. To also email the inboxes, set `RESEND_API_KEY`
 ## Stack
 
 Next.js, TypeScript, Tailwind CSS, shadcn/ui.
+# hey-mursal
