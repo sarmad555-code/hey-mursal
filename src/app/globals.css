@@ -239,3 +239,84 @@
 .petal {
   animation: petal-fall linear infinite;
 }
+
+@keyframes plane-away {
+  0% {
+    transform: translate(28px, 620px) rotate(-32deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(250px, 36px) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes plane-in {
+  0% {
+    transform: translate(260px, 24px) rotate(-24deg);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(120px, 280px) rotate(8deg);
+    opacity: 1;
+  }
+}
+
+@keyframes heart-away {
+  0% {
+    transform: translate(40px, 640px) scale(0.4);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(230px, 70px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes heart-in {
+  0% {
+    transform: translate(250px, 40px) scale(0.4);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(130px, 300px) scale(1);
+    opacity: 0.2;
+  }
+}
+
+.paper-plane,
+.paper-plane-in,
+.heart-trail,
+.heart-trail-in {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.paper-plane {
+  animation: plane-away 2.2s cubic-bezier(0.37, 0.02, 0.24, 1) forwards;
+}
+
+.paper-plane-in {
+  animation: plane-in 2.05s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+.heart-trail {
+  animation: heart-away 2s ease-out forwards;
+}
+
+.heart-trail-in {
+  animation: heart-in 1.9s ease-out forwards;
+}

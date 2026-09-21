@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useState, useTransition, type PointerEvent } from "react";
+import { useEffect, useRef, useState, useTransition, type PointerEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { PaperPlaneFlight } from "@/components/paper-plane";
 import {
   cheerByMood,
   herName,
   herNickname,
   loveNotes,
   moods,
+  piecesOfHer,
   type MoodId,
 } from "@/lib/cheer-data";
+import type { Hug } from "@/lib/hugs";
 import { cn } from "@/lib/utils";
 
 type Step = "welcome" | "mood" | "cheer" | "notes" | "close";
@@ -151,7 +154,40 @@ export function CheerApp() {
   const [longestHug, setLongestHug] = useState(0);
   const [noteIndex, setNoteIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [pieceId, setPieceId] = useState<(typeof piecesOfHer)[number]["id"] | null>(null);
+  const [flight, setFlight] = useState<null | "away" | "in">(null);
+  const [sendingHug, setSendingHug] = useState(false);
+  const [sentNote, setSentNote] = useState<string | null>(null);
+  const [arrival, setArrival] = useState<Hug | null>(null);
+  const announcedHug = useRef<string | null>(null);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function lookForHug() {
+      try {
+        const response = await fetch("/api/hugs?inbox=mursal");
+        if (!response.ok) return;
+        const data = (await response.json()) as { hugs: Hug[] };
+        const fresh = data.hugs.find((hug) => hug.from === "sarmad" && !hug.seen);
+        if (!cancelled && fresh && announcedHug.current !== fresh.id) {
+          announcedHug.current = fresh.id;
+          setArrival(fresh);
+          setFlight("in");
+        }
+      } catch {
+        // Quiet if the pocket is offline. The rest of the app still works.
+      }
+    }
+
+    void lookForHug();
+    const timer = window.setInterval(() => void lookForHug(), 15000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   useEffect(() => {
     if (!holding) return;
@@ -214,6 +250,46 @@ export function CheerApp() {
     go("welcome");
   }
 
+  async function sendHimAHug() {
+    if (sendingHug || flight === "away") return;
+    setSendingHug(true);
+    setSentNote(null);
+    setFlight("away");
+    try {
+      const response = await fetch("/api/hugs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "send", from: "mursal" }),
+      });
+      const data = (await response.json()) as { throttled?: boolean };
+      setSentNote(
+        data.throttled
+          ? "That hug is already flying to him."
+          : "On its way. He'll feel it."
+      );
+    } catch {
+      setSentNote("It's held here for him. You can try again in a moment.");
+    } finally {
+      setSendingHug(false);
+    }
+  }
+
+  async function keepArrival() {
+    setArrival(null);
+    setFlight(null);
+    try {
+      await fetch("/api/hugs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "seen", inbox: "mursal" }),
+      });
+    } catch {
+      // The hug already landed on screen.
+    }
+  }
+
+  const activePiece = piecesOfHer.find((piece) => piece.id === pieceId);
+
   function hugLabel() {
     if (holding) {
       if (hugSeconds < 1) return "I've got you…";
@@ -227,6 +303,23 @@ export function CheerApp() {
     <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden">
       <Atmosphere intensify={step === "cheer" && hugging} />
       <FloatingBits active={step === "notes" || (step === "cheer" && hugging)} />
+      {flight && (
+        <PaperPlaneFlight mode={flight} onDone={() => setFlight(null)} />
+      )}
+      {arrival && !flight && (
+        <div className="absolute inset-x-5 top-24 z-40 animate-fade-up rounded-[1.5rem] bg-white/85 px-5 py-5 text-center shadow-[0_18px_40px_-24px_rgba(77,143,214,0.55)] ring-1 ring-primary/15 backdrop-blur-md">
+          <p className="font-display text-2xl text-ink">A hug just landed.</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {arrival.note || "No words. Just him, here with you."}
+          </p>
+          <Button
+            className="mt-4 h-11 w-full rounded-2xl bg-primary text-primary-foreground"
+            onClick={() => void keepArrival()}
+          >
+            Keep it close
+          </Button>
+        </div>
+      )}
 
       <div className="relative z-10 flex flex-1 flex-col px-6 pb-10 pt-[max(1.5rem,env(safe-area-inset-top))]">
         {step === "welcome" && (
@@ -250,6 +343,28 @@ export function CheerApp() {
                 You don&apos;t have to tell me what&apos;s going on. I&apos;m here if you need me —
                 pasta dreams, nature walks, Jonny &amp; Mango included.
               </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {piecesOfHer.map((piece) => (
+                  <button
+                    key={piece.id}
+                    type="button"
+                    onClick={() =>
+                      setPieceId((current) => (current === piece.id ? null : piece.id))
+                    }
+                    className={cn(
+                      "rounded-full bg-white/70 px-3 py-1.5 text-sm text-ink ring-1 ring-primary/10",
+                      pieceId === piece.id && "bg-primary text-primary-foreground ring-primary"
+                    )}
+                  >
+                    {piece.label}
+                  </button>
+                ))}
+              </div>
+              {activePiece && (
+                <p className="mt-3 max-w-[34ch] text-sm leading-relaxed text-ink/80">
+                  {activePiece.line}
+                </p>
+              )}
             </div>
 
             <div className="relative mt-10 flex flex-1 items-end justify-center pb-6">
@@ -410,6 +525,18 @@ export function CheerApp() {
               >
                 Open cute notes
               </Button>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-12 w-full rounded-2xl bg-secondary text-base text-secondary-foreground"
+                onClick={() => void sendHimAHug()}
+                disabled={sendingHug || flight === "away"}
+              >
+                Send him a hug
+              </Button>
+              {sentNote && (
+                <p className="text-center text-sm text-muted-foreground">{sentNote}</p>
+              )}
             </div>
           </section>
         )}
