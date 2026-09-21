@@ -68,7 +68,7 @@ export default function SarmadAccessPage() {
       if (data.throttled) {
         setStatus("That one is already on its way. Give it a moment.");
       } else if (data.emailed) {
-        setStatus("Sent to mursalsafar1357@gmail.com — and it will land in her pocket.");
+        setStatus("Sent to sarmadsimab555@gmail.com — and it will land in her pocket.");
         setNote("");
       } else {
         setStatus(
@@ -138,7 +138,7 @@ export default function SarmadAccessPage() {
       <h1 className="mt-3 font-display text-4xl font-medium">Send Mursal a hug</h1>
       <p className="mt-3 text-sm leading-relaxed text-[#5d6f8a]">
         When she holds the hug button, it shows up here and in your inbox at sarmadsimab@gmail.com.
-        Send one back and it emails mursalsafar1357@gmail.com, then flies into her pocket.
+        Send one back and it emails sarmadsimab555@gmail.com, then flies into her pocket.
       </p>
 
       <label className="mt-8 block text-sm text-[#5d6f8a]" htmlFor="note">
