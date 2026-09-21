@@ -69,32 +69,32 @@ export const piecesOfHer = [
   {
     id: "pasta",
     label: "Pasta",
-    line: "A warm bowl, you at the table — that's the kind of evening I want on repeat.",
+    line: "A warm bowl, you at the table - that's the kind of evening I want on repeat.",
   },
   {
     id: "baking",
     label: "Baking",
-    line: "Flour on the counter, something sweet in the oven. That's you making a room feel like home.",
+    line: "Flour on the counter, something sweet in the oven. you can make a room feel like home <3",
   },
   {
     id: "nature",
     label: "Nature",
-    line: "Trees, sky, you. The world looks kinder when you're the one walking through it.",
+    line: "Trees, sky, you. The world looks kinder when you're the one walking through it xx",
   },
   {
     id: "jonny",
     label: "Jonny",
-    line: "Goodest boy. Extra scratches from me, always. He knows you're the soft place.",
+    line: "Ts nga the biggest chud ik. Extra scratches from me for my son. He knows you're his safe place.",
   },
   {
     id: "mango",
     label: "Mango",
-    line: "Tiny bird, huge personality. Tell Mango I said hi — the two of you are a pair.",
+    line: "Be careful I don't mistake her for an actual Mango. They're my fave fruit remember that...",
   },
   {
     id: "london",
     label: "London",
-    line: "Central London, just us, the whole afternoon. I still carry that day with me.",
+    line: "Central London, just us, the whole afternoon. no day has felt similar since <3",
   },
 ] as const;
 
