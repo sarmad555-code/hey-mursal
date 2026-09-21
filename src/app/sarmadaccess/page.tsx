@@ -11,12 +11,23 @@ export default function SarmadAccessPage() {
   const [sending, setSending] = useState(false);
   const [flight, setFlight] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<string[]>([]);
+  const [savingNotes, setSavingNotes] = useState(false);
+  const [noteStatus, setNoteStatus] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/hugs?inbox=sarmad");
-    if (!response.ok) return;
-    const data = (await response.json()) as { hugs: Hug[] };
-    setHugs(data.hugs);
+    const [hugResponse, noteResponse] = await Promise.all([
+      fetch("/api/hugs?inbox=sarmad"),
+      fetch("/api/notes"),
+    ]);
+    if (hugResponse.ok) {
+      const data = (await hugResponse.json()) as { hugs: Hug[] };
+      setHugs(data.hugs);
+    }
+    if (noteResponse.ok) {
+      const data = (await noteResponse.json()) as { notes: string[] };
+      setDrafts(data.notes);
+    }
   }, []);
 
   useEffect(() => {
@@ -63,6 +74,29 @@ export default function SarmadAccessPage() {
     }
   }
 
+  async function saveNotes() {
+    setSavingNotes(true);
+    setNoteStatus(null);
+    try {
+      const response = await fetch("/api/notes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes: drafts }),
+      });
+      const data = (await response.json()) as { notes?: string[]; error?: string };
+      if (!response.ok || !data.notes) {
+        setNoteStatus(data.error ?? "Could not save those.");
+        return;
+      }
+      setDrafts(data.notes);
+      setNoteStatus("Saved. She’ll see these the next time she opens a note.");
+    } catch {
+      setNoteStatus("Could not save just now.");
+    } finally {
+      setSavingNotes(false);
+    }
+  }
+
   return (
     <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-[#eef5ff] px-6 py-10 text-[#1f2d44]">
       {flight && <PaperPlaneFlight mode="away" onDone={() => setFlight(false)} />}
@@ -71,7 +105,7 @@ export default function SarmadAccessPage() {
       </p>
       <h1 className="mt-3 font-display text-4xl font-medium">Send Mursal a hug</h1>
       <p className="mt-3 text-sm leading-relaxed text-[#5d6f8a]">
-        When she sends one, it shows up here and in your inbox at sarmadsimab@gmail.com.
+        When she holds the hug button, it shows up here and in your inbox at sarmadsimab@gmail.com.
         Send one back and it emails mursalsafar1357@gmail.com, then flies into her pocket.
       </p>
 
@@ -99,7 +133,7 @@ export default function SarmadAccessPage() {
       <h2 className="mt-10 font-display text-2xl">Hugs she sent you</h2>
       {hugs.length === 0 ? (
         <p className="mt-3 text-sm text-[#5d6f8a]">
-          Nothing yet. When she taps send, it lands here.
+          Nothing yet. When she holds the hug, it lands here.
         </p>
       ) : (
         <ul className="mt-4 flex flex-col gap-3">
@@ -119,6 +153,58 @@ export default function SarmadAccessPage() {
           ))}
         </ul>
       )}
+
+      <h2 className="mt-12 font-display text-2xl">Her notes</h2>
+      <p className="mt-2 text-sm leading-relaxed text-[#5d6f8a]">
+        Rewrite these so they sound like you. She taps through them in this order.
+      </p>
+      <div className="mt-4 flex flex-col gap-3">
+        {drafts.map((draft, index) => (
+          <label key={index} className="block">
+            <span className="mb-1 flex items-center justify-between text-xs text-[#5d6f8a]">
+              Note {index + 1}
+              <button
+                type="button"
+                className="text-[#c45b7a]"
+                onClick={() =>
+                  setDrafts((current) => current.filter((_, item) => item !== index))
+                }
+              >
+                Remove
+              </button>
+            </span>
+            <textarea
+              value={draft}
+              maxLength={500}
+              onChange={(event) =>
+                setDrafts((current) =>
+                  current.map((item, itemIndex) =>
+                    itemIndex === index ? event.target.value : item
+                  )
+                )
+              }
+              className="min-h-24 w-full rounded-2xl bg-white/80 px-4 py-3 text-sm leading-relaxed ring-1 ring-[#4d8fd6]/15 outline-none focus:ring-[#4d8fd6]/40"
+            />
+          </label>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-col gap-3">
+        <Button
+          variant="secondary"
+          className="h-11 rounded-2xl bg-[#ffd6e3] text-[#3a2740]"
+          onClick={() => setDrafts((current) => [...current, ""])}
+        >
+          Add a note
+        </Button>
+        <Button
+          className="h-11 rounded-2xl bg-[#4d8fd6] text-white hover:bg-[#4d8fd6]/90"
+          onClick={() => void saveNotes()}
+          disabled={savingNotes}
+        >
+          Save her notes
+        </Button>
+      </div>
+      {noteStatus && <p className="mt-3 text-sm text-[#5d6f8a]">{noteStatus}</p>}
     </main>
   );
 }

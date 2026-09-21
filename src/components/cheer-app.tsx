@@ -152,6 +152,7 @@ export function CheerApp() {
   const [holding, setHolding] = useState(false);
   const [hugSeconds, setHugSeconds] = useState(0);
   const [longestHug, setLongestHug] = useState(0);
+  const [notes, setNotes] = useState<string[]>(loveNotes);
   const [noteIndex, setNoteIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [pieceId, setPieceId] = useState<(typeof piecesOfHer)[number]["id"] | null>(null);
@@ -160,7 +161,26 @@ export function CheerApp() {
   const [sentNote, setSentNote] = useState<string | null>(null);
   const [arrival, setArrival] = useState<Hug | null>(null);
   const announcedHug = useRef<string | null>(null);
+  const registeredThisHold = useRef(false);
+  const sendHugRef = useRef<() => Promise<void>>(async () => {});
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/notes")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { notes?: string[] } | null) => {
+        if (!cancelled && data?.notes && data.notes.length > 0) {
+          setNotes(data.notes);
+        }
+      })
+      .catch(() => {
+        // The built-in notes still show if this fails.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -188,6 +208,19 @@ export function CheerApp() {
       window.clearInterval(timer);
     };
   }, []);
+
+  useEffect(() => {
+    if (!holding) {
+      registeredThisHold.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      if (registeredThisHold.current) return;
+      registeredThisHold.current = true;
+      void sendHugRef.current();
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [holding]);
 
   useEffect(() => {
     if (!holding) return;
@@ -222,7 +255,11 @@ export function CheerApp() {
   }
 
   function startHug(event: PointerEvent<HTMLButtonElement>) {
-    event.currentTarget.setPointerCapture(event.pointerId);
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // The hold still counts if the browser will not capture the pointer.
+    }
     setHolding(true);
   }
 
@@ -238,7 +275,7 @@ export function CheerApp() {
       setRevealed(true);
       return;
     }
-    setNoteIndex((i) => (i + 1) % loveNotes.length);
+    setNoteIndex((i) => (i + 1) % notes.length);
   }
 
   function restart() {
@@ -251,7 +288,7 @@ export function CheerApp() {
   }
 
   async function sendHimAHug() {
-    if (sendingHug || flight === "away") return;
+    if (sendingHug) return;
     setSendingHug(true);
     setSentNote(null);
     setFlight("away");
@@ -287,6 +324,8 @@ export function CheerApp() {
       // The hug already landed on screen.
     }
   }
+
+  sendHugRef.current = sendHimAHug;
 
   const activePiece = piecesOfHer.find((piece) => piece.id === pieceId);
 
@@ -487,7 +526,7 @@ export function CheerApp() {
 
             <div className="mt-auto flex flex-col items-center gap-3 pt-10">
               <p className="text-center text-xs text-muted-foreground">
-                Hold as long as you want — no timer, no rush.
+                Hold as long as you want. After a moment, it flies to him.
               </p>
               <button
                 type="button"
@@ -582,7 +621,7 @@ export function CheerApp() {
                   key={noteIndex}
                   className="animate-fade-up font-display text-xl leading-relaxed text-ink sm:text-2xl"
                 >
-                  {loveNotes[noteIndex]}
+                  {notes[noteIndex] ?? notes[0]}
                 </p>
               )}
             </button>
