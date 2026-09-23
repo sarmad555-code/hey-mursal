@@ -160,6 +160,7 @@ export function CheerApp() {
   const [pieceId, setPieceId] = useState<string | null>(null);
   const [flight, setFlight] = useState<null | "away" | "in">(null);
   const [sendingHug, setSendingHug] = useState(false);
+  const [hugNote, setHugNote] = useState("");
   const [sentNote, setSentNote] = useState<string | null>(null);
   const [arrival, setArrival] = useState<Hug | null>(null);
   const announcedHug = useRef<string | null>(null);
@@ -304,6 +305,7 @@ export function CheerApp() {
     setSendingHug(true);
     setSentNote(null);
     setFlight("away");
+    const note = hugNote.trim();
     try {
       const response = await fetch("/api/hugs", {
         method: "POST",
@@ -311,6 +313,7 @@ export function CheerApp() {
         body: JSON.stringify({
           action: "send",
           from: "mursal",
+          note,
           mood: (() => {
             const chosen = moods.find((item) => item.id === mood);
             return chosen ? `${chosen.label} — ${chosen.hint}` : "";
@@ -318,6 +321,9 @@ export function CheerApp() {
         }),
       });
       const data = (await response.json()) as { throttled?: boolean };
+      if (!data.throttled) {
+        setHugNote("");
+      }
       setSentNote(
         data.throttled
           ? "That hug is already flying to him."
@@ -545,8 +551,40 @@ export function CheerApp() {
             </div>
 
             <div className="mt-auto flex flex-col items-center gap-3 pt-10">
-              <p className="text-center text-xs text-muted-foreground">
-                Hold as long as you want. After a moment, it flies to him.
+              <div className="w-full">
+                <label
+                  className="block text-center text-xs text-muted-foreground"
+                  htmlFor="hug-note"
+                >
+                  A line to go with it, if you want
+                </label>
+                <textarea
+                  id="hug-note"
+                  value={hugNote}
+                  maxLength={240}
+                  onChange={(event) => setHugNote(event.target.value)}
+                  placeholder="Missing you a little."
+                  className="mt-2 min-h-20 w-full rounded-2xl bg-white/70 px-4 py-3 text-base text-ink ring-1 ring-primary/15 outline-none placeholder:text-muted-foreground/70 focus:ring-primary/40"
+                />
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className="mt-3 h-12 w-full rounded-2xl bg-secondary text-base text-secondary-foreground"
+                  onClick={() => void sendHimAHug()}
+                  disabled={sendingHug || flight === "away"}
+                >
+                  Send him a hug
+                </Button>
+                {sentNote && (
+                  <p className="mt-2 text-center text-sm text-muted-foreground">
+                    {sentNote}
+                  </p>
+                )}
+              </div>
+
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                Or hold as long as you want. After a moment, it flies to him
+                {hugNote.trim() ? " with your note" : ""}.
               </p>
               <button
                 type="button"
@@ -584,18 +622,6 @@ export function CheerApp() {
               >
                 Open cute notes
               </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                className="h-12 w-full rounded-2xl bg-secondary text-base text-secondary-foreground"
-                onClick={() => void sendHimAHug()}
-                disabled={sendingHug || flight === "away"}
-              >
-                Send him a hug
-              </Button>
-              {sentNote && (
-                <p className="text-center text-sm text-muted-foreground">{sentNote}</p>
-              )}
             </div>
           </section>
         )}
