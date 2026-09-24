@@ -364,14 +364,14 @@ export function CheerApp() {
   }
 
   return (
-    <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden">
+    <main className="relative mx-auto flex h-dvh w-full max-w-md flex-col overflow-hidden">
       <Atmosphere intensify={step === "cheer" && hugging} />
       <FloatingBits active={step === "notes" || (step === "cheer" && hugging)} />
       {flight && (
         <PaperPlaneFlight mode={flight} onDone={() => setFlight(null)} />
       )}
       {arrival && !flight && (
-        <div className="absolute inset-x-5 top-24 z-40 animate-fade-up rounded-[1.5rem] bg-white/85 px-5 py-5 text-center shadow-[0_18px_40px_-24px_rgba(77,143,214,0.55)] ring-1 ring-primary/15 backdrop-blur-md">
+        <div className="absolute inset-x-5 top-20 z-40 animate-fade-up rounded-[1.5rem] bg-white/85 px-5 py-5 text-center shadow-[0_18px_40px_-24px_rgba(77,143,214,0.55)] ring-1 ring-primary/15 backdrop-blur-md">
           <p className="font-display text-2xl text-ink">A hug just landed.</p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             {arrival.note || "No words. Just him, here with you."}
@@ -385,30 +385,30 @@ export function CheerApp() {
         </div>
       )}
 
-      <div className="relative z-10 flex flex-1 flex-col px-6 pb-10 pt-[max(1.5rem,env(safe-area-inset-top))]">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
         {step === "welcome" && (
-          <section className="flex flex-1 flex-col justify-between py-4">
-            <div className="animate-fade-up pt-6">
-              <div className="mb-3 flex items-center gap-2 text-pink">
+          <section className="flex min-h-0 flex-1 flex-col gap-3 py-1">
+            <div className="animate-fade-up shrink-0">
+              <div className="mb-1.5 flex items-center gap-2 text-pink">
                 <TinyHeart className="text-pink" />
                 <span className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
                   just for mursal
                 </span>
                 <TinyHeart className="text-primary" />
               </div>
-              <p className="font-display text-5xl font-medium tracking-tight text-ink sm:text-6xl">
+              <p className="font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl">
                 Hey {herName}
               </p>
-              <p className="mt-2 font-display text-lg text-pink">{herNickname}</p>
-              <h1 className="mt-5 max-w-[16ch] font-display text-2xl font-medium leading-snug text-ink/90 sm:text-3xl">
+              <p className="mt-1 font-display text-base text-pink sm:text-lg">{herNickname}</p>
+              <h1 className="mt-2.5 max-w-[16ch] font-display text-xl font-medium leading-snug text-ink/90 sm:text-2xl">
                 A soft pocket made only for you.
               </h1>
-              <p className="mt-4 max-w-[32ch] text-base leading-relaxed text-muted-foreground">
+              <p className="mt-2 max-w-[32ch] text-sm leading-relaxed text-muted-foreground sm:text-base">
                 You don&apos;t have to tell me what&apos;s going on. I&apos;m here if you need me —
                 pasta dreams, nature walks, Jonny &amp; Mango included.
               </p>
-              <p className="mt-4 font-display text-lg text-primary">Love, Sarmad xx</p>
-              <div className="mt-5 flex flex-wrap gap-2">
+              <p className="mt-2 font-display text-base text-primary">Love, Sarmad xx</p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
                 {pieces.map((piece) => (
                   <button
                     key={piece.id}
@@ -417,7 +417,7 @@ export function CheerApp() {
                       setPieceId((current) => (current === piece.id ? null : piece.id))
                     }
                     className={cn(
-                      "rounded-full bg-white/70 px-3 py-1.5 text-sm text-ink ring-1 ring-primary/10",
+                      "rounded-full bg-white/70 px-2.5 py-1 text-sm text-ink ring-1 ring-primary/10",
                       pieceId === piece.id && "bg-primary text-primary-foreground ring-primary"
                     )}
                   >
@@ -426,22 +426,22 @@ export function CheerApp() {
                 ))}
               </div>
               {activePiece && (
-                <p className="mt-3 max-w-[34ch] text-sm leading-relaxed text-ink/80">
+                <p className="mt-2 max-w-[34ch] text-sm leading-relaxed text-ink/80">
                   {activePiece.line}
                 </p>
               )}
             </div>
 
-            <div className="relative mt-8 flex flex-1 flex-col items-center justify-end pb-4">
-              <div className="animate-float-soft relative flex h-52 w-52 items-center justify-center">
+            <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center">
+              <div className="animate-float-soft relative flex h-36 w-36 shrink-0 items-center justify-center sm:h-44 sm:w-44">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-b from-glow via-sky/80 to-blush opacity-95 shadow-[0_30px_60px_-20px_rgba(77,143,214,0.45)]" />
-                <div className="absolute inset-5 rounded-full bg-gradient-to-tr from-primary/20 via-white/30 to-pink/35" />
-                <Sparkle className="-top-1 right-8 text-primary" delay="0.2s" />
-                <Sparkle className="top-10 -left-1 text-pink" delay="0.8s" />
-                <Sparkle className="bottom-8 right-2 text-pink" delay="1.4s" />
+                <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-primary/20 via-white/30 to-pink/35 sm:inset-5" />
+                <Sparkle className="-top-1 right-6 text-primary sm:right-8" delay="0.2s" />
+                <Sparkle className="top-8 -left-1 text-pink sm:top-10" delay="0.8s" />
+                <Sparkle className="right-2 bottom-6 text-pink sm:bottom-8" delay="1.4s" />
                 <svg
                   viewBox="0 0 120 120"
-                  className="relative h-20 w-20 text-primary"
+                  className="relative h-14 w-14 text-primary sm:h-20 sm:w-20"
                   aria-hidden
                 >
                   <path
@@ -451,12 +451,12 @@ export function CheerApp() {
                   />
                 </svg>
               </div>
-              <p className="mt-3 w-full text-center text-sm font-medium tracking-wide text-primary">
+              <p className="mt-2 w-full shrink-0 text-center text-sm font-medium tracking-wide text-primary">
                 Jonny · Mango · you
               </p>
             </div>
 
-            <div className="animate-fade-up" style={{ animationDelay: "0.15s" }}>
+            <div className="animate-fade-up shrink-0" style={{ animationDelay: "0.15s" }}>
               <Button
                 size="lg"
                 className="h-12 w-full rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
@@ -469,7 +469,7 @@ export function CheerApp() {
         )}
 
         {step === "mood" && (
-          <section className="flex flex-1 flex-col py-4">
+          <section className="flex min-h-0 flex-1 flex-col py-1">
             <button
               type="button"
               onClick={() => go("welcome")}
@@ -477,19 +477,19 @@ export function CheerApp() {
             >
               ← Back
             </button>
-            <div className="animate-fade-up mt-8">
+            <div className="animate-fade-up mt-3 shrink-0">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
                 Hey {herName} <TinyHeart className="text-pink" />
               </p>
-              <h2 className="mt-2 font-display text-3xl font-medium text-ink">
+              <h2 className="mt-1.5 font-display text-2xl font-medium text-ink sm:text-3xl">
                 How&apos;s your heart?
               </h2>
-              <p className="mt-3 text-muted-foreground">
+              <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
                 No wrong answers. You don&apos;t even have to explain why.
               </p>
             </div>
 
-            <ul className="mt-8 flex flex-col gap-3">
+            <ul className="mt-4 flex min-h-0 flex-1 flex-col justify-center gap-2">
               {moods.map((m, i) => (
                 <li
                   key={m.id}
@@ -499,7 +499,7 @@ export function CheerApp() {
                   <button
                     type="button"
                     onClick={() => pickMood(m.id)}
-                    className="flex w-full items-center justify-between rounded-2xl bg-white/65 px-5 py-4 text-left shadow-[0_1px_0_rgba(31,45,68,0.04)] ring-1 ring-primary/10 backdrop-blur-sm transition hover:bg-white/90 hover:ring-pink/30 active:scale-[0.99]"
+                    className="flex w-full items-center justify-between rounded-2xl bg-white/65 px-4 py-3 text-left shadow-[0_1px_0_rgba(31,45,68,0.04)] ring-1 ring-primary/10 backdrop-blur-sm transition hover:bg-white/90 hover:ring-pink/30 active:scale-[0.99]"
                   >
                     <span className="flex items-center gap-3">
                       <span
@@ -526,7 +526,7 @@ export function CheerApp() {
         )}
 
         {step === "cheer" && cheer && (
-          <section className="flex flex-1 flex-col py-4">
+          <section className="flex min-h-0 flex-1 flex-col py-1">
             <button
               type="button"
               onClick={() => go("mood")}
@@ -535,23 +535,23 @@ export function CheerApp() {
               ← Moods
             </button>
 
-            <div className="animate-fade-up mt-8">
+            <div className="animate-fade-up mt-3 shrink-0">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
                 Hey {herName} <TinyHeart className="text-pink" />
               </p>
-              <h2 className="mt-2 font-display text-3xl font-medium leading-tight text-ink">
+              <h2 className="mt-1.5 font-display text-2xl font-medium leading-tight text-ink sm:text-3xl">
                 {cheer.headline}
               </h2>
-              <p className="mt-4 text-base leading-relaxed text-foreground/85">
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85 sm:text-base">
                 {cheer.message}
               </p>
-              <p className="mt-5 border-l-2 border-pink/50 pl-4 text-sm italic text-muted-foreground">
+              <p className="mt-2 border-l-2 border-pink/50 pl-3 text-sm italic text-muted-foreground">
                 {cheer.reminder}
               </p>
             </div>
 
-            <div className="mt-auto flex flex-col items-center gap-3 pt-10">
-              <div className="w-full">
+            <div className="mt-auto flex min-h-0 flex-col items-center gap-2 pt-3">
+              <div className="w-full shrink-0">
                 <label
                   className="block text-center text-xs text-muted-foreground"
                   htmlFor="hug-note"
@@ -562,27 +562,28 @@ export function CheerApp() {
                   id="hug-note"
                   value={hugNote}
                   maxLength={240}
+                  rows={2}
                   onChange={(event) => setHugNote(event.target.value)}
                   placeholder="Missing you a little."
-                  className="mt-2 min-h-20 w-full rounded-2xl bg-white/70 px-4 py-3 text-base text-ink ring-1 ring-primary/15 outline-none placeholder:text-muted-foreground/70 focus:ring-primary/40"
+                  className="mt-1.5 max-h-16 min-h-14 w-full resize-none rounded-2xl bg-white/70 px-4 py-2.5 text-sm text-ink ring-1 ring-primary/15 outline-none placeholder:text-muted-foreground/70 focus:ring-primary/40"
                 />
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="mt-3 h-12 w-full rounded-2xl bg-secondary text-base text-secondary-foreground"
+                  className="mt-2 h-11 w-full rounded-2xl bg-secondary text-base text-secondary-foreground"
                   onClick={() => void sendHimAHug()}
                   disabled={sendingHug || flight === "away"}
                 >
                   Send him a hug
                 </Button>
                 {sentNote && (
-                  <p className="mt-2 text-center text-sm text-muted-foreground">
+                  <p className="mt-1.5 text-center text-sm text-muted-foreground">
                     {sentNote}
                   </p>
                 )}
               </div>
 
-              <p className="mt-4 text-center text-xs text-muted-foreground">
+              <p className="text-center text-xs text-muted-foreground">
                 Or hold as long as you want. After a moment, it flies to him
                 {hugNote.trim() ? " with your note" : ""}.
               </p>
@@ -593,11 +594,11 @@ export function CheerApp() {
                 onPointerUp={endHug}
                 onPointerCancel={endHug}
                 className={cn(
-                  "relative flex h-40 w-40 touch-none select-none items-center justify-center rounded-full bg-gradient-to-b from-glow via-sky to-blush text-center shadow-[0_20px_40px_-18px_rgba(77,143,214,0.55)] transition",
+                  "relative flex h-32 w-32 shrink-0 touch-none select-none items-center justify-center rounded-full bg-gradient-to-b from-glow via-sky to-blush text-center shadow-[0_20px_40px_-18px_rgba(77,143,214,0.55)] transition",
                   holding && "animate-heartbeat scale-105 ring-4 ring-pink/40"
                 )}
               >
-                <span className="px-4 font-display text-lg font-medium leading-snug text-ink">
+                <span className="px-3 font-display text-base font-medium leading-snug text-ink">
                   {hugLabel()}
                 </span>
                 {holding && (
@@ -614,7 +615,7 @@ export function CheerApp() {
 
               <Button
                 size="lg"
-                className="mt-4 h-12 w-full rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
+                className="mt-1 h-11 w-full shrink-0 rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
                 onClick={() => {
                   setRevealed(false);
                   go("notes");
@@ -627,7 +628,7 @@ export function CheerApp() {
         )}
 
         {step === "notes" && (
-          <section className="flex flex-1 flex-col py-4">
+          <section className="flex min-h-0 flex-1 flex-col py-1">
             <button
               type="button"
               onClick={() => go("cheer")}
@@ -636,14 +637,14 @@ export function CheerApp() {
               ← Back
             </button>
 
-            <div className="animate-fade-up mt-8">
+            <div className="animate-fade-up mt-3 shrink-0">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
                 Hey {herName} <TinyHeart className="text-pink" />
               </p>
-              <h2 className="mt-2 font-display text-3xl font-medium text-ink">
+              <h2 className="mt-1.5 font-display text-2xl font-medium text-ink sm:text-3xl">
                 Little notes for you
               </h2>
-              <p className="mt-3 text-muted-foreground">
+              <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
                 Pasta, nature, Jonny, Mango — and how wonderful you are.
               </p>
             </div>
@@ -651,7 +652,7 @@ export function CheerApp() {
             <button
               type="button"
               onClick={nextNote}
-              className="animate-fade-up relative mt-10 flex min-h-52 w-full flex-col items-center justify-center rounded-[1.75rem] bg-white/70 px-7 py-10 text-center shadow-[0_18px_40px_-24px_rgba(77,143,214,0.4)] ring-1 ring-primary/15 backdrop-blur-md transition active:scale-[0.99]"
+              className="animate-fade-up relative mt-4 flex min-h-0 w-full flex-1 flex-col items-center justify-center rounded-[1.75rem] bg-white/70 px-6 py-6 text-center shadow-[0_18px_40px_-24px_rgba(77,143,214,0.4)] ring-1 ring-primary/15 backdrop-blur-md transition active:scale-[0.99]"
             >
               <Sparkle className="top-4 left-5 text-primary" />
               <Sparkle className="top-6 right-6 text-pink" delay="0.6s" />
@@ -665,19 +666,19 @@ export function CheerApp() {
               ) : (
                 <p
                   key={noteIndex}
-                  className="animate-fade-up font-display text-xl leading-relaxed text-ink sm:text-2xl"
+                  className="animate-fade-up font-display text-lg leading-relaxed text-ink sm:text-xl"
                 >
                   {notes[noteIndex] ?? notes[0]}
                 </p>
               )}
             </button>
 
-            <div className="mt-auto flex flex-col gap-3 pt-10">
+            <div className="mt-3 flex shrink-0 flex-col gap-2 pt-1">
               {revealed && (
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="h-12 w-full rounded-2xl bg-secondary text-base text-secondary-foreground hover:bg-secondary/80"
+                  className="h-11 w-full rounded-2xl bg-secondary text-base text-secondary-foreground hover:bg-secondary/80"
                   onClick={nextNote}
                 >
                   Another note
@@ -685,7 +686,7 @@ export function CheerApp() {
               )}
               <Button
                 size="lg"
-                className="h-12 w-full rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
+                className="h-11 w-full rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
                 onClick={() => go("close")}
               >
                 That&apos;s enough for now
@@ -695,27 +696,27 @@ export function CheerApp() {
         )}
 
         {step === "close" && (
-          <section className="flex flex-1 flex-col justify-between py-4">
-            <div className="animate-fade-up mt-16 text-center">
-              <div className="mb-4 flex justify-center gap-2 text-pink">
+          <section className="flex min-h-0 flex-1 flex-col justify-between py-1">
+            <div className="animate-fade-up mt-6 text-center">
+              <div className="mb-3 flex justify-center gap-2 text-pink">
                 <TinyHeart className="animate-bob text-primary" />
                 <TinyHeart className="animate-bob text-pink [animation-delay:0.2s]" />
                 <TinyHeart className="animate-bob text-primary [animation-delay:0.4s]" />
               </div>
-              <p className="font-display text-5xl font-medium text-ink">
+              <p className="font-display text-4xl font-medium text-ink sm:text-5xl">
                 Hey {herName}
               </p>
-              <h2 className="mt-8 font-display text-2xl font-medium leading-snug text-ink">
+              <h2 className="mt-4 font-display text-xl font-medium leading-snug text-ink sm:text-2xl">
                 Come back whenever.
               </h2>
-              <p className="mx-auto mt-4 max-w-[30ch] text-base leading-relaxed text-muted-foreground">
+              <p className="mx-auto mt-3 max-w-[30ch] text-sm leading-relaxed text-muted-foreground sm:text-base">
                 You never have to explain. I&apos;m here if you need me — and Jonny &amp; Mango
                 send soft hellos too.
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-6">
-              <div className="animate-float-soft relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-b from-glow via-sky to-blush">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-float-soft relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-b from-glow via-sky to-blush">
                 <Sparkle className="-top-2 right-2 text-pink" />
                 <svg viewBox="0 0 120 120" className="h-10 w-10 text-primary" aria-hidden>
                   <path
