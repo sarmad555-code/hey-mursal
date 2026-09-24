@@ -385,7 +385,7 @@ export function CheerApp() {
         </div>
       )}
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col px-6 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]">
         {step === "welcome" && (
           <section className="flex min-h-0 flex-1 flex-col gap-3 py-1">
             <div className="animate-fade-up shrink-0">
