@@ -1,6 +1,5 @@
-import { mkdir, readFile, writeFile } from "fs/promises";
-import path from "path";
 import type { Person } from "@/lib/hugs";
+import { readDurableJson, writeDurableJson } from "@/lib/durable-json";
 
 export type PushSubscriptionJSON = {
   endpoint: string;
@@ -18,21 +17,13 @@ export type StoredPushSubscription = {
   updatedAt: string;
 };
 
-const filePath = path.join(process.cwd(), "data", "push-subscriptions.json");
-
 async function readAll(): Promise<StoredPushSubscription[]> {
-  try {
-    const raw = await readFile(filePath, "utf8");
-    const parsed = JSON.parse(raw) as StoredPushSubscription[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  const parsed = await readDurableJson<StoredPushSubscription[]>("push-subscriptions");
+  return Array.isArray(parsed) ? parsed : [];
 }
 
 async function writeAll(items: StoredPushSubscription[]) {
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, JSON.stringify(items, null, 2));
+  await writeDurableJson("push-subscriptions", items);
 }
 
 export async function listSubscriptions(person: Person) {

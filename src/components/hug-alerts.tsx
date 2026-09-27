@@ -96,8 +96,11 @@ export function HugAlerts({ person, className, compact }: Props) {
           subscription: serialized,
         }),
       });
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
       if (!response.ok) {
-        setMessage("Couldn’t save alerts just now.");
+        setMessage(data?.error ?? "Couldn’t save alerts just now.");
         return;
       }
       setSubscription(sub);

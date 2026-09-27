@@ -26,23 +26,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unknown person" }, { status: 400 });
   }
 
-  if (body.action === "unsubscribe") {
-    const endpoint = body.subscription?.endpoint;
-    if (!endpoint) {
-      return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });
-    }
-    await removePersonSubscription(who, endpoint);
-    return NextResponse.json({ ok: true });
-  }
-
-  if (body.action !== "subscribe" || !body.subscription) {
-    return NextResponse.json({ error: "Unknown action" }, { status: 400 });
-  }
-
   try {
+    if (body.action === "unsubscribe") {
+      const endpoint = body.subscription?.endpoint;
+      if (!endpoint) {
+        return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });
+      }
+      await removePersonSubscription(who, endpoint);
+      return NextResponse.json({ ok: true });
+    }
+
+    if (body.action !== "subscribe" || !body.subscription) {
+      return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+    }
+
     const saved = await saveSubscription(who, body.subscription);
     return NextResponse.json({ ok: true, subscription: saved });
-  } catch {
-    return NextResponse.json({ error: "Invalid subscription" }, { status: 400 });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Could not save subscription";
+    const status = message.includes("Upstash Redis") ? 503 : 400;
+    console.error("Push subscribe failed", error);
+    return NextResponse.json({ error: message }, { status });
   }
 }

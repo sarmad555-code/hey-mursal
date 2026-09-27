@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto";
-import { mkdir, readFile, writeFile } from "fs/promises";
-import path from "path";
+import { readDurableJson, writeDurableJson } from "@/lib/durable-json";
 
 export type Person = "mursal" | "sarmad";
 
@@ -15,21 +14,13 @@ export type Hug = {
   emailed: boolean;
 };
 
-const filePath = path.join(process.cwd(), "data", "hugs.json");
-
 async function readAll(): Promise<Hug[]> {
-  try {
-    const raw = await readFile(filePath, "utf8");
-    const parsed = JSON.parse(raw) as Hug[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  const parsed = await readDurableJson<Hug[]>("hugs");
+  return Array.isArray(parsed) ? parsed : [];
 }
 
 async function writeAll(hugs: Hug[]) {
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, JSON.stringify(hugs, null, 2));
+  await writeDurableJson("hugs", hugs);
 }
 
 export async function listHugs(inbox: Person): Promise<Hug[]> {

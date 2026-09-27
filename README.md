@@ -48,6 +48,17 @@ VAPID_SUBJECT=mailto:you@example.com
 
 Without VAPID keys or an enabled device, in-app hugs still work.
 
+## Saving data on Vercel
+
+Local saves use files in `data/`. On Vercel the disk can’t keep those, so connect **Upstash Redis** (free):
+
+1. Vercel project → **Storage** → **Create Database** → **Redis** (Upstash)
+2. Connect it to this project (it adds `KV_REST_API_URL` / `KV_REST_API_TOKEN`, or the Upstash equivalents)
+3. Redeploy
+
+That stores hugs, notes, home pills, and push subscriptions.
+
 ## Stack
 
-Next.js, TypeScript, Tailwind CSS, shadcn/ui, Web Push.
+Next.js, TypeScript, Tailwind CSS, shadcn/ui, Web Push, Upstash Redis.
+
