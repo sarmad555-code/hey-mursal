@@ -132,7 +132,7 @@ export default function SarmadAccessPage() {
   }
 
   return (
-    <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-[#eef5ff] px-6 py-10 text-[#1f2d44]">
+    <main className="relative mx-auto flex h-dvh min-h-0 w-full max-w-md flex-1 flex-col overflow-y-auto overscroll-y-contain bg-[#eef5ff] px-6 py-10 pb-[max(2.5rem,env(safe-area-inset-bottom))] text-[#1f2d44]">
       {flight && <PaperPlaneFlight mode="away" onDone={() => setFlight(false)} />}
       <p className="text-xs font-medium tracking-[0.18em] text-[#4d8fd6] uppercase">
         For you, not her screen
