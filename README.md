@@ -19,11 +19,22 @@ Edit `src/lib/cheer-data.ts` — add strings to the `loveNotes` array and tweak 
 
 - When Mursal holds the hug button for a moment, a paper airplane with a heart trail flies off, and the hug is listed at `/sarmadaccess`.
 - Rewrite her notes on that same page. She reads whatever you save.
-- You send one back at [/sarmadaccess](http://127.0.0.1:4321/sarmadaccess). That emails mursalsafar1357@gmail.com and lands in her pocket the next time she opens the app.
+- You send one back at [/sarmadaccess](http://127.0.0.1:4321/sarmadaccess). That can text her phone and lands in her pocket the next time she opens the app.
 
-Hugs always land inside the app. To also email the inboxes, set `RESEND_API_KEY` and optional `HUG_FROM_EMAIL` (a verified Resend sender). Without that key, `/sarmadaccess` still lists her hugs and a hug you send still appears in her pocket.
+Hugs always land inside the app. To also send SMS texts, set these on the server (e.g. Vercel env vars):
+
+```bash
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_FROM_NUMBER=+1XXXXXXXXXX
+SARMAD_PHONE=+1XXXXXXXXXX
+MURSAL_PHONE=+1XXXXXXXXXX
+```
+
+Optional: `APP_URL` (your live site URL) so the text includes a link back to the pocket / `/sarmadaccess`.
+
+Without Twilio credentials, `/sarmadaccess` still lists her hugs and a hug you send still appears in her pocket.
 
 ## Stack
 
 Next.js, TypeScript, Tailwind CSS, shadcn/ui.
-# hey-mursal
