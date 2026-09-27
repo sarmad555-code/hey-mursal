@@ -30,6 +30,12 @@ export async function listHugs(inbox: Person): Promise<Hug[]> {
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
+/** Shared timeline of hugs both ways — newest first. */
+export async function listJournal(): Promise<Hug[]> {
+  const hugs = await readAll();
+  return hugs.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+}
+
 export async function recentlySent(from: Person) {
   const hugs = await readAll();
   const latest = hugs

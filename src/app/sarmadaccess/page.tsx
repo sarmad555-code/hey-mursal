@@ -3,12 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { HugAlerts } from "@/components/hug-alerts";
+import { HugJournal, JournalIcon } from "@/components/hug-journal";
 import { PaperPlaneFlight } from "@/components/paper-plane";
 import type { HomePill } from "@/lib/cheer-data";
-import type { Hug } from "@/lib/hugs";
 
 export default function SarmadAccessPage() {
-  const [hugs, setHugs] = useState<Hug[]>([]);
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
   const [flight, setFlight] = useState(false);
@@ -19,17 +18,14 @@ export default function SarmadAccessPage() {
   const [pillDrafts, setPillDrafts] = useState<HomePill[]>([]);
   const [savingPills, setSavingPills] = useState(false);
   const [pillStatus, setPillStatus] = useState<string | null>(null);
+  const [journalKey, setJournalKey] = useState(0);
+  const [showJournal, setShowJournal] = useState(true);
 
   const load = useCallback(async () => {
-    const [hugResponse, noteResponse, pillResponse] = await Promise.all([
-      fetch("/api/hugs?inbox=sarmad"),
+    const [noteResponse, pillResponse] = await Promise.all([
       fetch("/api/notes"),
       fetch("/api/pills"),
     ]);
-    if (hugResponse.ok) {
-      const data = (await hugResponse.json()) as { hugs: Hug[] };
-      setHugs(data.hugs);
-    }
     if (noteResponse.ok) {
       const data = (await noteResponse.json()) as { notes: string[] };
       setDrafts(data.notes);
@@ -77,6 +73,7 @@ export default function SarmadAccessPage() {
           "It's in her pocket. Push needs hug alerts enabled on her phone (and VAPID keys on the server)."
         );
       }
+      setJournalKey((key) => key + 1);
       await load();
     } catch {
       setStatus("Couldn’t send just now. Try again in a second.");
@@ -134,9 +131,20 @@ export default function SarmadAccessPage() {
   return (
     <main className="relative mx-auto flex h-dvh min-h-0 w-full max-w-md flex-1 flex-col overflow-y-auto overscroll-y-contain bg-[#eef5ff] px-6 py-10 pb-[max(2.5rem,env(safe-area-inset-bottom))] text-[#1f2d44]">
       {flight && <PaperPlaneFlight mode="away" onDone={() => setFlight(false)} />}
-      <p className="text-xs font-medium tracking-[0.18em] text-[#4d8fd6] uppercase">
-        For you, not her screen
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs font-medium tracking-[0.18em] text-[#4d8fd6] uppercase">
+          For you, not her screen
+        </p>
+        <button
+          type="button"
+          aria-label={showJournal ? "Hide hug journal" : "Open hug journal"}
+          aria-expanded={showJournal}
+          onClick={() => setShowJournal((open) => !open)}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/80 text-[#4d8fd6] ring-1 ring-[#4d8fd6]/15"
+        >
+          <JournalIcon />
+        </button>
+      </div>
       <h1 className="mt-3 font-display text-4xl font-medium">Send Mursal a hug</h1>
       <p className="mt-3 text-sm leading-relaxed text-[#5d6f8a]">
         When she holds the hug button, it shows up here and can ping your phone.
@@ -168,33 +176,21 @@ export default function SarmadAccessPage() {
       </Button>
       {status && <p className="mt-3 text-sm text-[#5d6f8a]">{status}</p>}
 
-      <h2 className="mt-10 font-display text-2xl">Hugs she sent you</h2>
-      {hugs.length === 0 ? (
-        <p className="mt-3 text-sm text-[#5d6f8a]">
-          Nothing yet. When she holds the hug, it lands here.
-        </p>
-      ) : (
-        <ul className="mt-4 flex flex-col gap-3">
-          {hugs.map((hug) => (
-            <li
-              key={hug.id}
-              className="rounded-2xl bg-white/75 px-4 py-3 ring-1 ring-[#4d8fd6]/10"
-            >
-              <p className="text-sm font-medium">
-                {new Date(hug.createdAt).toLocaleString()}
-                {hug.seen ? "" : " · new"}
-              </p>
-              {hug.mood ? (
-                <p className="mt-1 text-sm font-medium text-[#1f2d44]">
-                  She&apos;s feeling: {hug.mood}
-                </p>
-              ) : null}
-              <p className="mt-1 text-sm text-[#5d6f8a]">
-                {hug.note || (hug.mood ? "" : "A hug, no words.")}
-              </p>
-            </li>
-          ))}
-        </ul>
+      {showJournal && (
+        <section className="mt-10">
+          <h2 className="flex items-center gap-2 font-display text-2xl">
+            <JournalIcon className="text-[#4d8fd6]" /> Our journal
+          </h2>
+          <p className="mt-2 text-sm text-[#5d6f8a]">
+            Hugs both ways — hers and yours.
+          </p>
+          <HugJournal
+            key={journalKey}
+            viewer="sarmad"
+            className="mt-4"
+            emptyText="Nothing yet. When either of you sends a hug, it lands here."
+          />
+        </section>
       )}
 
       <h2 className="mt-12 font-display text-2xl">Her notes</h2>

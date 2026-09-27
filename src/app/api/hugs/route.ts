@@ -1,4 +1,11 @@
-import { addHug, listHugs, markSeen, recentlySent, type Person } from "@/lib/hugs";
+import {
+  addHug,
+  listHugs,
+  listJournal,
+  markSeen,
+  recentlySent,
+  type Person,
+} from "@/lib/hugs";
 import { sendHugPush } from "@/lib/push";
 import { NextResponse } from "next/server";
 
@@ -7,7 +14,12 @@ function person(value: unknown): Person | null {
 }
 
 export async function GET(request: Request) {
-  const inbox = person(new URL(request.url).searchParams.get("inbox"));
+  const inboxParam = new URL(request.url).searchParams.get("inbox");
+  if (inboxParam === "journal") {
+    const hugs = await listJournal();
+    return NextResponse.json({ hugs });
+  }
+  const inbox = person(inboxParam);
   if (!inbox) {
     return NextResponse.json({ error: "Unknown inbox" }, { status: 400 });
   }
