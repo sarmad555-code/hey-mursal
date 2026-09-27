@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { HugAlerts } from "@/components/hug-alerts";
 import { PaperPlaneFlight } from "@/components/paper-plane";
 import type { HomePill } from "@/lib/cheer-data";
 import type { Hug } from "@/lib/hugs";
@@ -62,17 +63,18 @@ export default function SarmadAccessPage() {
         }),
       });
       const data = (await response.json()) as {
+        notified?: boolean;
         emailed?: boolean;
         throttled?: boolean;
       };
       if (data.throttled) {
         setStatus("That one is already on its way. Give it a moment.");
-      } else if (data.emailed) {
-        setStatus("Sent to mursalsafar1357@gmail.com — and it will land in her pocket.");
+      } else if (data.notified ?? data.emailed) {
+        setStatus("Push sent — and it will land in her pocket.");
         setNote("");
       } else {
         setStatus(
-          "It's in her pocket. Inbox email still needs a Resend API key on the server."
+          "It's in her pocket. Push needs hug alerts enabled on her phone (and VAPID keys on the server)."
         );
       }
       await load();
@@ -137,9 +139,13 @@ export default function SarmadAccessPage() {
       </p>
       <h1 className="mt-3 font-display text-4xl font-medium">Send Mursal a hug</h1>
       <p className="mt-3 text-sm leading-relaxed text-[#5d6f8a]">
-        When she holds the hug button, it shows up here and in your inbox at sarmadsimab@gmail.com.
-        Send one back and it emails mursalsafar1357@gmail.com, then flies into her pocket.
+        When she holds the hug button, it shows up here and can ping your phone.
+        Send one back and it can ping hers, then flies into her pocket.
       </p>
+
+      <div className="mt-6">
+        <HugAlerts person="sarmad" />
+      </div>
 
       <label className="mt-8 block text-sm text-[#5d6f8a]" htmlFor="note">
         A line to go with it, if you want

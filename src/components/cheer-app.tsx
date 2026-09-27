@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition, type PointerEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { HugAlerts } from "@/components/hug-alerts";
 import { PaperPlaneFlight } from "@/components/paper-plane";
 import {
   cheerByMood,
@@ -456,7 +457,11 @@ export function CheerApp() {
               </p>
             </div>
 
-            <div className="animate-fade-up shrink-0" style={{ animationDelay: "0.15s" }}>
+            <div
+              className="animate-fade-up flex shrink-0 flex-col gap-2"
+              style={{ animationDelay: "0.15s" }}
+            >
+              <HugAlerts person="mursal" compact />
               <Button
                 size="lg"
                 className="h-12 w-full rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"

@@ -1,5 +1,5 @@
 import { addHug, listHugs, markSeen, recentlySent, type Person } from "@/lib/hugs";
-import { hugMailContent, sendHugMail } from "@/lib/mail";
+import { sendHugPush } from "@/lib/push";
 import { NextResponse } from "next/server";
 
 function person(value: unknown): Person | null {
@@ -47,24 +47,30 @@ export async function POST(request: Request) {
   const mood = typeof body.mood === "string" ? body.mood : "";
   const recent = await recentlySent(from);
   if (recent) {
-    return NextResponse.json({ ok: true, throttled: true, emailed: recent.emailed, hug: recent });
+    return NextResponse.json({
+      ok: true,
+      throttled: true,
+      notified: recent.emailed,
+      emailed: recent.emailed,
+      hug: recent,
+    });
   }
 
-  let emailed = false;
+  let notified = false;
   try {
-    const result = await sendHugMail({ to, note, mood });
-    emailed = result.emailed;
+    const result = await sendHugPush({ to, note, mood });
+    notified = result.notified;
   } catch (error) {
-    console.error("Hug mail threw", error);
+    console.error("Hug push threw", error);
   }
 
-  const hug = await addHug({ from, note, mood, emailed });
-  const mail = hugMailContent({ to, note, mood });
+  // `emailed` kept on the stored hug for existing data shape / older clients.
+  const hug = await addHug({ from, note, mood, emailed: notified });
   return NextResponse.json({
     ok: true,
     throttled: false,
-    emailed,
+    notified,
+    emailed: notified,
     hug,
-    mail: emailed ? undefined : mail,
   });
 }
