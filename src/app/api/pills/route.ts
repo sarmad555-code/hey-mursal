@@ -13,6 +13,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ pills });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not save pills";
-    return NextResponse.json({ error: message }, { status: 400 });
+    const status = message.includes("Upstash Redis") ? 503 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
 }
