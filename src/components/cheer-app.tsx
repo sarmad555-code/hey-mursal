@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition, type PointerEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { HugAlerts } from "@/components/hug-alerts";
+import { HugJournal, JournalIcon } from "@/components/hug-journal";
 import { PaperPlaneFlight } from "@/components/paper-plane";
 import {
   cheerByMood,
@@ -17,7 +18,7 @@ import {
 import type { Hug } from "@/lib/hugs";
 import { cn } from "@/lib/utils";
 
-type Step = "welcome" | "mood" | "cheer" | "notes" | "close";
+type Step = "welcome" | "mood" | "cheer" | "notes" | "journal" | "close";
 
 const moodDots: Record<MoodId, string> = {
   tired: "bg-sky",
@@ -390,12 +391,25 @@ export function CheerApp() {
         {step === "welcome" && (
           <section className="flex min-h-0 flex-1 flex-col gap-3 py-1">
             <div className="animate-fade-up shrink-0">
-              <div className="mb-1.5 flex items-center gap-2 text-pink">
-                <TinyHeart className="text-pink" />
-                <span className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
-                  just for mursal
-                </span>
-                <TinyHeart className="text-primary" />
+              <div className="mb-1.5 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-pink">
+                  <TinyHeart className="text-pink" />
+                  <span className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
+                    just for mursal
+                  </span>
+                  <TinyHeart className="text-primary" />
+                </div>
+                <button
+                  type="button"
+                  aria-label="Open hug journal"
+                  onClick={() => {
+                    void keepArrival();
+                    go("journal");
+                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-primary ring-1 ring-primary/15 transition hover:bg-white hover:ring-primary/30"
+                >
+                  <JournalIcon />
+                </button>
               </div>
               <p className="font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl">
                 Hey {herName}
@@ -469,6 +483,32 @@ export function CheerApp() {
               >
                 Hi, I&apos;m here
               </Button>
+            </div>
+          </section>
+        )}
+
+        {step === "journal" && (
+          <section className="flex min-h-0 flex-1 flex-col py-1">
+            <button
+              type="button"
+              onClick={() => go("welcome")}
+              className="self-start text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              ← Home
+            </button>
+            <div className="animate-fade-up mt-3 shrink-0">
+              <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
+                <JournalIcon className="h-4 w-4" /> Our journal
+              </p>
+              <h2 className="mt-1.5 font-display text-2xl font-medium text-ink sm:text-3xl">
+                Hugs between you two
+              </h2>
+              <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
+                Everything you&apos;ve sent each other — his words and yours.
+              </p>
+            </div>
+            <div className="mt-4 min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-2">
+              <HugJournal viewer="mursal" />
             </div>
           </section>
         )}
