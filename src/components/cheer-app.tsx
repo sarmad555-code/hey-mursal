@@ -15,10 +15,15 @@ import {
   type HomePill,
   type MoodId,
 } from "@/lib/cheer-data";
-import type { Hug } from "@/lib/hugs";
+import type { Hug, Person } from "@/lib/hugs";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 type Step = "welcome" | "mood" | "cheer" | "notes" | "journal" | "close";
+
+type CheerAppProps = {
+  viewer?: Person;
+};
 
 const moodDots: Record<MoodId, string> = {
   tired: "bg-sky",
@@ -149,7 +154,13 @@ function formatHugTime(seconds: number) {
   return `${m}m ${s.toString().padStart(2, "0")}s`;
 }
 
-export function CheerApp() {
+export function CheerApp({ viewer = "mursal" }: CheerAppProps) {
+  const forHer = viewer === "mursal";
+  const other: Person = forHer ? "sarmad" : "mursal";
+  const displayName = forHer ? herName : "Sarmad";
+  const partnerLabel = forHer ? "him" : "her";
+  const partnerCap = forHer ? "He" : "She";
+
   const [step, setStep] = useState<Step>("welcome");
   const [mood, setMood] = useState<MoodId | null>(null);
   const [holding, setHolding] = useState(false);
@@ -202,10 +213,10 @@ export function CheerApp() {
 
     async function lookForHug() {
       try {
-        const response = await fetch("/api/hugs?inbox=mursal");
+        const response = await fetch(`/api/hugs?inbox=${viewer}`);
         if (!response.ok) return;
         const data = (await response.json()) as { hugs: Hug[] };
-        const fresh = data.hugs.find((hug) => hug.from === "sarmad" && !hug.seen);
+        const fresh = data.hugs.find((hug) => hug.from === other && !hug.seen);
         if (!cancelled && fresh && announcedHug.current !== fresh.id) {
           announcedHug.current = fresh.id;
           setArrival(fresh);
@@ -222,7 +233,7 @@ export function CheerApp() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, []);
+  }, [viewer, other]);
 
   useEffect(() => {
     if (!holding) {
@@ -252,7 +263,6 @@ export function CheerApp() {
     };
   }, [holding]);
 
-  const cheer = mood ? cheerByMood[mood] : null;
   const hugging = holding;
 
   function go(next: Step) {
@@ -302,7 +312,7 @@ export function CheerApp() {
     go("welcome");
   }
 
-  async function sendHimAHug() {
+  async function sendAHug() {
     if (sendingHug) return;
     setSendingHug(true);
     setSentNote(null);
@@ -314,7 +324,7 @@ export function CheerApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "send",
-          from: "mursal",
+          from: viewer,
           note,
           mood: (() => {
             const chosen = moods.find((item) => item.id === mood);
@@ -328,11 +338,13 @@ export function CheerApp() {
       }
       setSentNote(
         data.throttled
-          ? "That hug is already flying to him."
-          : "On its way. He'll feel it."
+          ? `That hug is already flying to ${partnerLabel}.`
+          : `On its way. ${partnerCap}'ll feel it.`
       );
     } catch {
-      setSentNote("It's held here for him. You can try again in a moment.");
+      setSentNote(
+        `It's held here for ${partnerLabel}. You can try again in a moment.`
+      );
     } finally {
       setSendingHug(false);
     }
@@ -345,14 +357,21 @@ export function CheerApp() {
       await fetch("/api/hugs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "seen", inbox: "mursal" }),
+        body: JSON.stringify({ action: "seen", inbox: viewer }),
       });
     } catch {
       // The hug already landed on screen.
     }
   }
 
-  sendHugRef.current = sendHimAHug;
+  sendHugRef.current = sendAHug;
+
+  const cheer = mood
+    ? {
+        ...cheerByMood[mood],
+        headline: cheerByMood[mood].headline.replaceAll(herName, displayName),
+      }
+    : null;
 
   const activePiece = pieces.find((piece) => piece.id === pieceId);
 
@@ -376,7 +395,10 @@ export function CheerApp() {
         <div className="absolute inset-x-5 top-20 z-40 animate-fade-up rounded-[1.5rem] bg-white/85 px-5 py-5 text-center shadow-[0_18px_40px_-24px_rgba(77,143,214,0.55)] ring-1 ring-primary/15 backdrop-blur-md">
           <p className="font-display text-2xl text-ink">A hug just landed.</p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {arrival.note || "No words. Just him, here with you."}
+            {arrival.note ||
+              (forHer
+                ? "No words. Just him, here with you."
+                : "No words. Just her, here with you.")}
           </p>
           <Button
             className="mt-4 h-11 w-full rounded-2xl bg-primary text-primary-foreground"
@@ -391,11 +413,19 @@ export function CheerApp() {
         {step === "welcome" && (
           <section className="flex min-h-0 flex-1 flex-col gap-3 py-1">
             <div className="animate-fade-up shrink-0">
+              {!forHer && (
+                <Link
+                  href="/sarmadaccess"
+                  className="mb-2 self-start text-sm text-muted-foreground transition hover:text-foreground"
+                >
+                  ← Admin
+                </Link>
+              )}
               <div className="mb-1.5 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-pink">
                   <TinyHeart className="text-pink" />
                   <span className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
-                    just for mursal
+                    {forHer ? "just for mursal" : "just for sarmad"}
                   </span>
                   <TinyHeart className="text-primary" />
                 </div>
@@ -412,17 +442,24 @@ export function CheerApp() {
                 </button>
               </div>
               <p className="font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl">
-                Hey {herName}
+                Hey {displayName}
               </p>
-              <p className="mt-1 font-display text-base text-pink sm:text-lg">{herNickname}</p>
-              <h1 className="mt-2.5 max-w-[16ch] font-display text-xl font-medium leading-snug text-ink/90 sm:text-2xl">
-                A soft pocket made only for you.
+              <p className="mt-1 font-display text-base text-pink sm:text-lg">
+                {forHer ? herNickname : "Your pocket too"}
+              </p>
+              <h1 className="mt-2.5 max-w-[18ch] font-display text-xl font-medium leading-snug text-ink/90 sm:text-2xl">
+                {forHer
+                  ? "A soft pocket made only for you."
+                  : "The same soft pocket — for when she reaches for you."}
               </h1>
               <p className="mt-2 max-w-[32ch] text-sm leading-relaxed text-muted-foreground sm:text-base">
-                You don&apos;t have to tell me what&apos;s going on. I&apos;m here if you need me —
-                pasta dreams, nature walks, Jonny &amp; Mango included.
+                {forHer
+                  ? "You don't have to tell me what's going on. I'm here if you need me — pasta dreams, nature walks, Jonny & Mango included."
+                  : "Her hugs land here. Hold one back the same way she does — moods, notes, journal, and all."}
               </p>
-              <p className="mt-2 font-display text-base text-primary">Love, Sarmad xx</p>
+              <p className="mt-2 font-display text-base text-primary">
+                {forHer ? "Love, Sarmad xx" : `For you & ${herName}`}
+              </p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {pieces.map((piece) => (
                   <button
@@ -475,7 +512,7 @@ export function CheerApp() {
               className="animate-fade-up flex shrink-0 flex-col gap-2"
               style={{ animationDelay: "0.15s" }}
             >
-              <HugAlerts person="mursal" compact />
+              <HugAlerts person={viewer} compact />
               <Button
                 size="lg"
                 className="h-12 w-full rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
@@ -504,11 +541,13 @@ export function CheerApp() {
                 Hugs between you two
               </h2>
               <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
-                Everything you&apos;ve sent each other — his words and yours.
+                {forHer
+                  ? "Everything you've sent each other — his words and yours."
+                  : "Everything you've sent each other — her words and yours."}
               </p>
             </div>
             <div className="mt-4 min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-2">
-              <HugJournal viewer="mursal" />
+              <HugJournal viewer={viewer} />
             </div>
           </section>
         )}
@@ -524,7 +563,7 @@ export function CheerApp() {
             </button>
             <div className="animate-fade-up mt-3 shrink-0">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
-                Hey {herName} <TinyHeart className="text-pink" />
+                Hey {displayName} <TinyHeart className="text-pink" />
               </p>
               <h2 className="mt-1.5 font-display text-2xl font-medium text-ink sm:text-3xl">
                 How&apos;s your heart?
@@ -582,7 +621,7 @@ export function CheerApp() {
 
             <div className="animate-fade-up mt-3 shrink-0">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
-                Hey {herName} <TinyHeart className="text-pink" />
+                Hey {displayName} <TinyHeart className="text-pink" />
               </p>
               <h2 className="mt-1.5 font-display text-2xl font-medium leading-tight text-ink sm:text-3xl">
                 {cheer.headline}
@@ -616,10 +655,10 @@ export function CheerApp() {
                   variant="secondary"
                   size="lg"
                   className="mt-2 h-11 w-full rounded-2xl bg-secondary text-base text-secondary-foreground"
-                  onClick={() => void sendHimAHug()}
+                  onClick={() => void sendAHug()}
                   disabled={sendingHug || flight === "away"}
                 >
-                  Send him a hug
+                  Send {partnerLabel} a hug
                 </Button>
                 {sentNote && (
                   <p className="mt-1.5 text-center text-sm text-muted-foreground">
@@ -629,7 +668,8 @@ export function CheerApp() {
               </div>
 
               <p className="text-center text-xs text-muted-foreground">
-                Or hold as long as you want. After a moment, it flies to him
+                Or hold as long as you want. After a moment, it flies to{" "}
+                {partnerLabel}
                 {hugNote.trim() ? " with your note" : ""}.
               </p>
               <button
@@ -684,13 +724,15 @@ export function CheerApp() {
 
             <div className="animate-fade-up mt-3 shrink-0">
               <p className="inline-flex items-center gap-1.5 font-display text-sm tracking-wide text-primary">
-                Hey {herName} <TinyHeart className="text-pink" />
+                Hey {displayName} <TinyHeart className="text-pink" />
               </p>
               <h2 className="mt-1.5 font-display text-2xl font-medium text-ink sm:text-3xl">
-                Little notes for you
+                {forHer ? "Little notes for you" : "Notes you wrote her"}
               </h2>
               <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
-                Pasta, nature, Jonny, Mango — and how wonderful you are.
+                {forHer
+                  ? "Pasta, nature, Jonny, Mango — and how wonderful you are."
+                  : "The same soft lines she taps through in her pocket."}
               </p>
             </div>
 
@@ -749,14 +791,15 @@ export function CheerApp() {
                 <TinyHeart className="animate-bob text-primary [animation-delay:0.4s]" />
               </div>
               <p className="font-display text-4xl font-medium text-ink sm:text-5xl">
-                Hey {herName}
+                Hey {displayName}
               </p>
               <h2 className="mt-4 font-display text-xl font-medium leading-snug text-ink sm:text-2xl">
                 Come back whenever.
               </h2>
               <p className="mx-auto mt-3 max-w-[30ch] text-sm leading-relaxed text-muted-foreground sm:text-base">
-                You never have to explain. I&apos;m here if you need me — and Jonny &amp; Mango
-                send soft hellos too.
+                {forHer
+                  ? "You never have to explain. I'm here if you need me — and Jonny & Mango send soft hellos too."
+                  : "Her hugs will find you here. Come back whenever you need the same soft place."}
               </p>
             </div>
 

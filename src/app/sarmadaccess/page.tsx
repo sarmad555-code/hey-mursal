@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HugAlerts } from "@/components/hug-alerts";
 import { HugJournal, JournalIcon } from "@/components/hug-journal";
@@ -151,8 +152,17 @@ export default function SarmadAccessPage() {
         Send one back and it can ping hers, then flies into her pocket.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-col gap-3">
         <HugAlerts person="sarmad" />
+        <Link
+          href="/sarmadaccess/pocket"
+          className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#ffd6e3] text-base font-medium text-[#3a2740] transition hover:bg-[#ffc9db]"
+        >
+          Open my pocket
+        </Link>
+        <p className="text-center text-xs text-[#5d6f8a]">
+          Same soft interface as hers — receive her hugs, hold one back, journal, notes.
+        </p>
       </div>
 
       <label className="mt-8 block text-sm text-[#5d6f8a]" htmlFor="note">
